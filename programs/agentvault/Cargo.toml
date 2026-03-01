@@ -1,0 +1,29 @@
+[package]
+name = "agentvault"
+version = "0.1.0"
+description = "AgentVault Solana Program - Autonomous DeFi agent infrastructure"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/cloudweaver/agentvault"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "agentvault"
+
+[features]
+default = []
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = { version = "0.32.0", features = ["init-if-needed"] }
+anchor-spl = "0.32.0"
+solana-program = "1.18"
+
+[dev-dependencies]
+solana-program-test = "1.18"
+solana-sdk = "1.18"
+tokio = { version = "1.37", features = ["full"] }
