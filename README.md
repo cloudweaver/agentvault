@@ -527,3 +527,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 [Website](https://agentvault.io) · [Docs](https://docs.agentvault.io) · [Twitter](https://twitter.com/agentvault) · [Discord](https://discord.gg/agentvault)
 
 </div>
+
