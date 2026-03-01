@@ -161,6 +161,20 @@ agentvault/
 │   │   └── types/               # TypeScript types
 │   └── package.json
 ├── app/                          # Frontend (Next.js)
+│   ├── src/
+│   │   ├── app/                 # App router pages
+│   │   ├── components/          # React components
+│   │   │   ├── chat-interface.tsx
+│   │   │   ├── portfolio-dashboard.tsx
+│   │   │   ├── activity-feed.tsx
+│   │   │   └── providers.tsx
+│   │   ├── contexts/
+│   │   │   └── VaultContext.tsx # Global vault state
+│   │   ├── hooks/
+│   │   │   └── useWebSocket.ts  # Real-time connection
+│   │   └── lib/
+│   │       └── api.ts           # HTTP API client
+│   └── package.json
 ├── docs/                         # Documentation
 ├── .env.example                  # Environment template
 ├── Anchor.toml                   # Anchor configuration
@@ -298,6 +312,51 @@ CREATE TABLE subscriptions (
 | MarginFi | `MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA` | Lending |
 | Kamino | `KLend2g3cP87ber41GAmhvH3VPVwWvxTKjkN6nh8VqD` | Lending |
 
+## Frontend
+
+The Next.js frontend provides a real-time interface for interacting with your AgentVault.
+
+### Key Components
+
+| Component | Description |
+|-----------|-------------|
+| `ChatInterface` | Natural language chat with action plan approval |
+| `PortfolioDashboard` | Real-time portfolio balances and positions |
+| `ActivityFeed` | Transaction history with reasoning traces |
+| `Providers` | Wallet adapters, React Query, VaultContext |
+
+### Hooks & Context
+
+```typescript
+// Use vault context for global state
+import { useVault } from '@/contexts/VaultContext';
+
+const { 
+  vault,           // Current vault info
+  portfolio,       // Portfolio balances
+  activities,      // Activity history
+  pendingPlans,    // Plans awaiting approval
+  connectionStatus,// WebSocket status
+  submitIntent,    // Send natural language intent
+  approvePlan,     // Approve action plan
+  rejectPlan,      // Reject action plan
+} = useVault();
+```
+
+```typescript
+// Direct WebSocket access
+import { useWebSocket } from '@/hooks/useWebSocket';
+
+const ws = useWebSocket({
+  onActionPlan: (plan) => console.log('New plan:', plan),
+  onPortfolioUpdate: (addr, portfolio) => console.log('Updated:', portfolio),
+  onPriceUpdate: (prices) => console.log('Prices:', prices),
+});
+
+ws.subscribe(vaultAddress);
+ws.submitIntent(vaultAddress, 'Swap 1 SOL to USDC');
+```
+
 ## Security
 
 ### Key Principles
@@ -407,10 +466,12 @@ The deployment script will:
 - [x] WebSocket + HTTP API servers
 - [x] PostgreSQL + Redis persistence
 
-### Phase 2: Autonomy 🔄
+### Phase 2: Autonomy ✅
 - [x] Monitoring loop with triggers
-- [ ] Devnet deployment
-- [ ] Frontend dashboard integration
+- [x] Deployment scripts (devnet)
+- [x] Frontend WebSocket integration
+- [x] Chat interface with plan approval
+- [x] Vault context and hooks
 - [ ] End-to-end testing
 
 ### Phase 3: Marketplace
