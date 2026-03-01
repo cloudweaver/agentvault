@@ -44,29 +44,26 @@ AgentVault transforms your Solana wallet into an intelligent, autonomous financi
 │              Next.js Dashboard · Mobile App · API               │
 └─────────────────────────────────────────────────────────────────┘
                                  │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    STRATEGY MARKETPLACE (L5)                    │
-│         On-chain Registry · Performance Tracking · Revenue      │
-└─────────────────────────────────────────────────────────────────┘
-                                 │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    PROTOCOL ADAPTERS (L4)                       │
-│          Jupiter · Marinade · MarginFi · Kamino · Orca          │
-└─────────────────────────────────────────────────────────────────┘
-                                 │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     POLICY ENGINE (L3)                          │
-│     Budget Limits · Rate Limiting · Allowlists · Constraints    │
-└─────────────────────────────────────────────────────────────────┘
-                                 │
+            ┌────────────────────┼────────────────────┐
+            ▼                    ▼                    ▼
+     ┌────────────┐      ┌────────────┐      ┌────────────┐
+     │  HTTP API  │      │ WebSocket  │      │  Database  │
+     │   :3001    │      │   :3002    │      │ PostgreSQL │
+     └────────────┘      └────────────┘      │   Redis    │
+            │                    │            └────────────┘
+            └────────────────────┼────────────────────┘
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    AGENT RUNTIME (L2)                           │
 │       LLM Reasoning · Tool Execution · Memory · Scheduler       │
 └─────────────────────────────────────────────────────────────────┘
+                                 │
+            ┌────────────────────┼────────────────────┐
+            ▼                    ▼                    ▼
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│  Jupiter Swap   │  │ Marinade Stake  │  │ MarginFi Lend   │
+│    Adapter      │  │    Adapter      │  │    Adapter      │
+└─────────────────┘  └─────────────────┘  └─────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
@@ -84,6 +81,8 @@ AgentVault transforms your Solana wallet into an intelligent, autonomous financi
 - [Anchor](https://www.anchor-lang.com/docs/installation) (0.32+)
 - [Node.js](https://nodejs.org/) (20+)
 - [pnpm](https://pnpm.io/) (8+)
+- [PostgreSQL](https://postgresql.org/) (15+)
+- [Redis](https://redis.io/) (7+)
 
 ### Installation
 
@@ -95,6 +94,13 @@ cd agentvault
 # Install dependencies
 pnpm install
 
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your API keys and database URLs
+
+# Run database migrations
+pnpm --filter runtime migrate
+
 # Build the Solana program
 anchor build
 
@@ -105,14 +111,7 @@ anchor test
 pnpm dev
 ```
 
-### Environment Setup
-
-```bash
-# Copy environment template
-cp .env.example .env
-
-# Configure your environment variables:
-```
+### Environment Variables
 
 | Variable | Description | Required |
 |----------|-------------|----------|
@@ -120,8 +119,9 @@ cp .env.example .env
 | `SOLANA_RPC_URL` | Solana RPC endpoint (Helius recommended) | ✅ |
 | `HELIUS_API_KEY` | Helius API key for webhooks & enhanced RPC | ✅ |
 | `DATABASE_URL` | PostgreSQL connection string | ✅ |
-| `REDIS_URL` | Redis URL for caching & sessions | Optional |
+| `REDIS_URL` | Redis URL for caching & sessions | ✅ |
 | `XAI_API_KEY` | Grok API key (fallback LLM) | Optional |
+| `BIRDEYE_API_KEY` | Birdeye API for backup prices | Optional |
 
 ## Project Structure
 
@@ -136,12 +136,7 @@ agentvault/
 │       │   │   ├── execute_swap.rs      # Jupiter CPI
 │       │   │   ├── execute_stake.rs     # Marinade CPI
 │       │   │   ├── execute_lend.rs      # MarginFi/Kamino CPI
-│       │   │   ├── update_policy.rs
-│       │   │   ├── withdraw.rs
-│       │   │   ├── emergency_halt.rs
-│       │   │   ├── register_strategy.rs
-│       │   │   ├── subscribe_strategy.rs
-│       │   │   └── record_performance.rs
+│       │   │   └── ...
 │       │   ├── state/           # Account structures
 │       │   └── errors.rs        # Custom errors
 │       └── Cargo.toml
@@ -149,6 +144,12 @@ agentvault/
 │   ├── src/
 │   │   ├── agent/
 │   │   │   └── runtime.ts       # Core agent orchestration
+│   │   ├── server/
+│   │   │   ├── http.ts          # REST API server
+│   │   │   └── websocket.ts     # Real-time WebSocket server
+│   │   ├── db/
+│   │   │   ├── postgres.ts      # PostgreSQL client & migrations
+│   │   │   └── redis.ts         # Redis caching & sessions
 │   │   ├── llm/
 │   │   │   └── claude.ts        # Claude integration
 │   │   ├── policy/
@@ -157,204 +158,152 @@ agentvault/
 │   │   │   ├── jupiter.ts       # Swap routing & execution
 │   │   │   ├── marinade.ts      # Liquid staking
 │   │   │   └── marginfi.ts      # Lending/borrowing
-│   │   ├── tools/               # MCP tool definitions
 │   │   └── types/               # TypeScript types
 │   └── package.json
 ├── app/                          # Frontend (Next.js)
-│   ├── src/
-│   │   ├── app/                 # App router pages
-│   │   ├── components/          # React components
-│   │   └── lib/                 # Utilities
-│   └── package.json
 ├── docs/                         # Documentation
-│   ├── ARCHITECTURE.md
-│   ├── POLICIES.md
-│   └── QUICKSTART.md
+├── .env.example                  # Environment template
 ├── Anchor.toml                   # Anchor configuration
 └── package.json                  # Workspace root
 ```
 
-## Solana Program
+## API Reference
 
-The AgentVault program provides on-chain infrastructure for secure, policy-constrained agent execution with real CPI calls to DeFi protocols.
+### HTTP API (Port 3001)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check |
+| `/stats` | GET | Server statistics |
+| `/protocols` | GET | List supported protocols |
+| `/protocols/stats` | GET | Protocol APYs and rates |
+| `/vaults/:address` | GET | Get vault info |
+| `/vaults/:address/portfolio` | GET | Get portfolio balances |
+| `/vaults/:address/activity` | GET | Get activity history |
+| `/vaults/:address/policy` | GET | Get policy config |
+| `/vaults/:address/intents` | POST | Submit natural language intent |
+| `/prices/:mint` | GET | Get token price |
+| `/quotes/swap` | POST | Get Jupiter swap quote |
+| `/quotes/stake` | POST | Get Marinade stake quote |
+| `/quotes/lend` | POST | Get MarginFi lend quote |
+
+### WebSocket API (Port 3002)
+
+**Client → Server Messages:**
+```typescript
+{ type: 'subscribe', vaultAddress: string }
+{ type: 'unsubscribe', vaultAddress: string }
+{ type: 'intent', vaultAddress: string, text: string }
+{ type: 'approve', planId: string }
+{ type: 'reject', planId: string }
+{ type: 'get_portfolio', vaultAddress: string }
+{ type: 'ping' }
+```
+
+**Server → Client Messages:**
+```typescript
+{ type: 'subscribed', vaultAddress: string }
+{ type: 'action_plan', plan: ActionPlan }
+{ type: 'action_executed', planId: string, signatures: string[], success: boolean }
+{ type: 'portfolio_update', vaultAddress: string, portfolio: Portfolio }
+{ type: 'price_update', prices: Record<string, number> }
+{ type: 'activity', entry: ActivityLogEntry }
+{ type: 'error', message: string, code?: string }
+{ type: 'pong' }
+```
+
+## Database Schema
+
+### PostgreSQL Tables
+
+```sql
+-- Vaults
+CREATE TABLE vaults (
+  address VARCHAR(44) PRIMARY KEY,
+  owner VARCHAR(44) NOT NULL,
+  agent VARCHAR(44) NOT NULL,
+  balance NUMERIC(20, 0) DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'active',
+  policy_hash VARCHAR(64),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Activity Logs
+CREATE TABLE activity_logs (
+  id UUID PRIMARY KEY,
+  vault_address VARCHAR(44) REFERENCES vaults(address),
+  action_type VARCHAR(50) NOT NULL,
+  tx_signature VARCHAR(88),
+  reasoning TEXT,
+  policy_decision VARCHAR(20) NOT NULL,
+  policy_errors JSONB,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Strategies
+CREATE TABLE strategies (
+  id VARCHAR(64) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  creator VARCHAR(44) NOT NULL,
+  config JSONB NOT NULL,
+  subscription_fee NUMERIC(20, 0) DEFAULT 0,
+  performance_fee_bps INTEGER DEFAULT 0,
+  subscriber_count INTEGER DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'active'
+);
+
+-- Subscriptions
+CREATE TABLE subscriptions (
+  vault_address VARCHAR(44) REFERENCES vaults(address),
+  strategy_id VARCHAR(64) REFERENCES strategies(id),
+  status VARCHAR(20) DEFAULT 'active',
+  PRIMARY KEY (vault_address, strategy_id)
+);
+```
+
+### Redis Keys
+
+| Key Pattern | Purpose | TTL |
+|-------------|---------|-----|
+| `price:{mint}` | Token price cache | 30s |
+| `vault:{address}:portfolio` | Portfolio cache | 60s |
+| `plan:{planId}` | Pending action plans | 5m |
+| `session:{id}` | User sessions | 24h |
+| `triggers:{vaultAddress}` | Active triggers | — |
+| `ratelimit:{key}` | Rate limiting | window |
+| `lock:{resource}` | Distributed locks | 10s |
+
+## Solana Program
 
 ### Instructions
 
 | Instruction | Description | CPI Target |
 |-------------|-------------|------------|
-| `initialize_vault` | Create user vault with agent delegate and initial policy | — |
-| `update_policy` | Update on-chain policy hash (user signature required) | — |
-| `execute_swap` | Agent-signed swap with slippage protection | Jupiter V6 |
+| `initialize_vault` | Create vault with agent delegate | — |
+| `update_policy` | Update policy hash (user-signed) | — |
+| `execute_swap` | Token swap with slippage protection | Jupiter V6 |
 | `execute_stake` | Stake SOL to liquid staking | Marinade |
-| `execute_lend` | Supply assets to lending protocols | MarginFi / Kamino |
-| `register_strategy` | Publish strategy to marketplace registry | — |
-| `subscribe_strategy` | Subscribe to a strategy with fee payment | — |
-| `withdraw` | User-signed withdrawal from vault | — |
-| `emergency_halt` | Freeze all agent activity (user-only) | — |
-
-### Account Structure
-
-```rust
-#[account]
-pub struct UserVault {
-    pub owner: Pubkey,           // User's main wallet
-    pub agent: Pubkey,           // Delegate keypair for agent
-    pub policy_hash: [u8; 32],   // Hash of active policy config
-    pub balance: u64,            // SOL balance in vault
-    pub status: VaultStatus,     // Active, Paused, Halted
-    pub last_activity: i64,
-    pub tx_count: u64,
-    pub created_at: i64,
-    pub bump: u8,
-}
-
-#[account]
-pub struct PolicyConfig {
-    pub vault: Pubkey,
-    pub daily_limit: u64,        // Max SOL per day
-    pub tx_limit: u64,           // Max SOL per transaction
-    pub daily_spent: u64,        // Tracking for daily limit
-    pub last_reset: i64,         // Last daily reset timestamp
-    pub max_slippage_bps: u16,   // Max slippage in basis points
-    pub asset_allowlist: Vec<Pubkey>,
-    pub program_allowlist: Vec<Pubkey>,
-    pub auto_execute: bool,
-    pub bump: u8,
-}
-```
+| `execute_lend` | Supply to lending protocols | MarginFi/Kamino |
+| `register_strategy` | Publish strategy to marketplace | — |
+| `subscribe_strategy` | Subscribe with fee payment | — |
+| `withdraw` | User-signed withdrawal | — |
+| `emergency_halt` | Freeze agent activity (user-only) | — |
 
 ### Integrated Protocols
 
 | Protocol | Address | Function |
 |----------|---------|----------|
 | Jupiter V6 | `JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4` | Token swaps |
-| Marinade | `MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD` | Liquid staking (mSOL) |
-| MarginFi | `MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA` | Lending/borrowing |
-| Kamino | `KLend2g3cP87ber41GAmhvH3VPVwWvxTKjkN6nh8VqD` | Lending/borrowing |
-
-## Agent Runtime
-
-The runtime hosts AI agents that interpret user intent and execute on-chain actions within policy constraints.
-
-### Execution Pipeline
-
-```
-┌─────────┐     ┌──────────┐     ┌──────────┐     ┌─────────┐     ┌────────┐
-│  PLAN   │ ──▶ │ VALIDATE │ ──▶ │ SIMULATE │ ──▶ │ EXECUTE │ ──▶ │ REPORT │
-└─────────┘     └──────────┘     └──────────┘     └─────────┘     └────────┘
-    │                │                │                │               │
-    ▼                ▼                ▼                ▼               ▼
-  LLM generates   Policy engine   Transaction      Adapters build   Results logged
-  ActionPlan      checks limits   simulation       & submit tx      with reasoning
-```
-
-### Protocol Adapters
-
-**Jupiter Adapter** (`runtime/src/adapters/jupiter.ts`)
-- Quote fetching with optimal routing
-- Slippage protection
-- Transaction simulation
-- Real-time price feeds
-
-**Marinade Adapter** (`runtime/src/adapters/marinade.ts`)
-- SOL → mSOL staking
-- Exchange rate fetching
-- APY estimation
-- Balance tracking
-
-**MarginFi Adapter** (`runtime/src/adapters/marginfi.ts`)
-- Deposit/withdraw operations
-- Pool APY fetching
-- Position management
-- Multi-asset support
-
-### Monitoring Loop
-
-The agent runs a background monitoring loop (default: 30 seconds) that:
-- Checks price feeds for trigger conditions
-- Evaluates portfolio health
-- Fires autonomous actions when conditions are met
-- Respects auto-execute policy settings
-
-## Policy Engine
-
-Policies define what the agent can and cannot do. They're enforced at two layers:
-
-1. **Off-chain (Runtime)** — Fast validation with detailed error messages
-2. **On-chain (Program)** — Final enforcement, trustless and tamper-proof
-
-### Policy Categories
-
-| Category | Description | Example |
-|----------|-------------|---------|
-| Spending Limits | Per-tx and daily maximums | Max 5 SOL per swap, 20 SOL/day |
-| Asset Allowlist | Tokens the agent can hold | Only SOL, USDC, mSOL |
-| Program Allowlist | Contracts the agent can call | Jupiter, Marinade, MarginFi |
-| Position Limits | Max allocation per token | Max 30% in any single token |
-| Slippage Guard | Maximum acceptable slippage | Reject trades with >1% slip |
-| Auto-Execute | Which actions need approval | Price triggers: auto; new protocols: manual |
-
-### Example Policy
-
-```json
-{
-  "version": 1,
-  "spending": {
-    "perTransaction": { "sol": 5 },
-    "daily": { "sol": 20 }
-  },
-  "allowlists": {
-    "assets": [
-      "So11111111111111111111111111111111111111112",
-      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-      "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So"
-    ],
-    "programs": [
-      "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
-      "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
-      "MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA"
-    ]
-  },
-  "limits": {
-    "maxPositionPercent": 30,
-    "minStablecoinPercent": 20,
-    "maxSlippageBps": 100
-  },
-  "autoExecute": {
-    "priceTriggers": true,
-    "newProtocols": false
-  }
-}
-```
-
-## Strategy Marketplace
-
-Users can publish, discover, and subscribe to agent strategies — reusable behavioral templates with verifiable on-chain performance.
-
-### Example Strategies
-
-| Strategy | Behavior | Risk |
-|----------|----------|------|
-| DCA Accumulator | Dollar-cost average into SOL weekly | Low |
-| Yield Optimizer | Rebalance to highest APY across protocols | Medium |
-| Momentum Trader | Buy tokens breaking 20-day highs | High |
-| Stablecoin Shield | Auto-convert to USDC on 10% drawdown | Low |
-| Airdrop Farmer | Interact with eligible protocols | Medium |
-
-### Revenue Model
-
-- **Subscription fees** — One-time or recurring SOL payments
-- **Performance fees** — Percentage of profits while subscribed
-- **Tip jar** — Optional user-initiated tips
+| Marinade | `MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD` | Liquid staking |
+| MarginFi | `MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA` | Lending |
+| Kamino | `KLend2g3cP87ber41GAmhvH3VPVwWvxTKjkN6nh8VqD` | Lending |
 
 ## Security
 
-Security is foundational to AgentVault. The system uses defense-in-depth:
-
 ### Key Principles
 
-1. **User keys never touch the agent** — A scoped delegate keypair handles execution
-2. **Delegate cannot withdraw** — Agent can trade within limits but not extract funds
+1. **User keys never touch the agent** — Scoped delegate keypair handles execution
+2. **Delegate cannot withdraw** — Agent trades within limits but can't extract funds
 3. **Dual-layer enforcement** — Off-chain for speed, on-chain for trust
 4. **Emergency halt is user-only** — No admin or agent override
 5. **Policy updates require user signature** — Agent cannot modify its own constraints
@@ -367,105 +316,74 @@ Security is foundational to AgentVault. The system uses defense-in-depth:
 | Runtime compromise | On-chain enforcement prevents unauthorized actions |
 | Rogue strategy | Strategies execute within user's policy bounds |
 | Oracle manipulation | Multi-source price feeds; reject on divergence |
-| MEV attacks | Jito bundles for private transaction submission |
 
 ## Development
 
 ### Building
 
 ```bash
-# Build Solana program
-anchor build
+anchor build                    # Solana program
+pnpm --filter runtime build     # Runtime
+pnpm --filter app build         # Frontend
+pnpm build                      # Everything
+```
 
-# Build runtime
-pnpm --filter runtime build
+### Database
 
-# Build frontend
-pnpm --filter app build
-
-# Build everything
-pnpm build
+```bash
+pnpm --filter runtime migrate        # Run migrations
+pnpm --filter runtime migrate:status # Check status
 ```
 
 ### Testing
 
 ```bash
-# Solana program tests
-anchor test
-
-# Runtime unit tests
-pnpm --filter runtime test
-
-# Integration tests
-pnpm test:integration
-
-# All tests
-pnpm test
+anchor test                     # Solana program
+pnpm --filter runtime test      # Runtime
+pnpm test                       # All tests
 ```
 
 ### Local Development
 
 ```bash
-# Start local Solana validator
-solana-test-validator
-
-# Deploy program locally
+solana-test-validator           # Start local validator
 anchor deploy --provider.cluster localnet
-
-# Start runtime in dev mode
-pnpm --filter runtime dev
-
-# Start frontend
-pnpm --filter app dev
+pnpm --filter runtime dev       # Runtime with hot reload
+pnpm --filter app dev           # Frontend
 ```
 
 ## Roadmap
 
 ### Phase 1: Foundation ✅
 - [x] Core Solana program (vault, policies)
-- [x] Jupiter swap CPI integration
-- [x] Marinade staking CPI integration
-- [x] MarginFi/Kamino lending CPI integration
+- [x] Jupiter/Marinade/MarginFi CPI integrations
 - [x] Agent runtime with Claude integration
-- [x] Policy engine (off-chain + on-chain validation)
-- [x] Protocol adapters (Jupiter, Marinade, MarginFi)
+- [x] Policy engine (off-chain + on-chain)
+- [x] Protocol adapters
+- [x] WebSocket + HTTP API servers
+- [x] PostgreSQL + Redis persistence
 
 ### Phase 2: Autonomy 🔄
-- [x] Monitoring loop with trigger evaluation
-- [ ] WebSocket server for real-time frontend connection
-- [ ] Database persistence (PostgreSQL + Redis)
+- [x] Monitoring loop with triggers
 - [ ] Devnet deployment
 - [ ] Frontend dashboard integration
+- [ ] End-to-end testing
 
 ### Phase 3: Marketplace
 - [ ] Strategy registration UI
-- [ ] Performance tracking with on-chain PnL snapshots
-- [ ] Revenue sharing system
-- [ ] Strategy store with filtering & ratings
+- [ ] Performance tracking
+- [ ] Revenue sharing
+- [ ] Strategy store
 
 ### Phase 4: Scale
-- [ ] Mobile app (React Native / PWA)
-- [ ] Multi-LLM providers (Grok fallback)
-- [ ] Jito bundle integration for MEV protection
-- [ ] Cross-chain expansion via Wormhole
+- [ ] Mobile app
+- [ ] Multi-LLM providers
+- [ ] Jito MEV protection
 - [ ] Mainnet deployment
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-```bash
-# Fork and clone
-git clone https://github.com/YOUR_USERNAME/agentvault.git
-
-# Create a branch
-git checkout -b feature/your-feature
-
-# Make changes and test
-pnpm test
-
-# Submit a pull request
-```
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
