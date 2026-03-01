@@ -13,11 +13,25 @@
 [![Anchor](https://img.shields.io/badge/Anchor-0.32+-teal.svg)](https://anchor-lang.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://typescriptlang.org)
 
-[Documentation](https://docs.agentvault.io) · [Live App](https://app.agentvault.io) · [Discord](https://discord.gg/agentvault)
+[**🎮 Interactive Demo**](https://htmlpreview.github.io/?https://github.com/cloudweaver/agentvault/blob/main/docs/demo.html) · [Documentation](https://github.com/cloudweaver/agentvault#readme) · [Discord](https://discord.gg/agentvault)
 
 </div>
 
 ---
+
+## 🎮 Try the Demo
+
+**[Launch Interactive Demo →](https://htmlpreview.github.io/?https://github.com/cloudweaver/agentvault/blob/main/docs/demo.html)**
+
+Experience the AI-powered wallet interface:
+- 💬 **Chat with the agent** using natural language
+- 🔄 **Swap tokens** via Jupiter with simulated quotes
+- 📈 **Stake SOL** with Marinade for yield
+- 🏦 **Lend assets** on MarginFi
+- ✅ **Approve/reject** action plans
+- 📊 **View portfolio** and activity feed
+
+> No wallet needed — fully interactive demo!
 
 ## Overview
 
