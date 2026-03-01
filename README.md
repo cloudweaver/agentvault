@@ -1,17 +1,13 @@
 <div align="center">
 
-<img src="assets/logo.svg" alt="AgentVault" width="120" />
-
-# AgentVault
-
-### Your Personal AI Agent Wallet on Solana
-
-*Autonomous DeFi management within user-defined guardrails*
+<img src="assets/banner.jpg" alt="AgentVault - Your Personal AI Agent Wallet on Solana" width="100%" />
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Solana](https://img.shields.io/badge/Solana-1.18+-purple.svg)](https://solana.com)
 [![Anchor](https://img.shields.io/badge/Anchor-0.32+-teal.svg)](https://anchor-lang.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://typescriptlang.org)
+
+*Autonomous DeFi management within user-defined guardrails*
 
 [**🎮 Interactive Demo**](https://htmlpreview.github.io/?https://github.com/cloudweaver/agentvault/blob/main/docs/demo.html) · [Documentation](https://github.com/cloudweaver/agentvault#readme) · [Discord](https://discord.gg/agentvault)
 
