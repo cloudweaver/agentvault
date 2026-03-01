@@ -352,6 +352,50 @@ pnpm --filter runtime dev       # Runtime with hot reload
 pnpm --filter app dev           # Frontend
 ```
 
+## Deployment
+
+### Devnet Deployment
+
+```bash
+# Ensure you have SOL for deployment
+solana airdrop 5 --url devnet
+
+# Deploy to devnet (builds, deploys, updates config)
+pnpm deploy:devnet
+
+# Setup test vault with agent keypair
+pnpm setup:vault
+
+# Generate TypeScript types from IDL
+pnpm generate:types
+```
+
+The deployment script will:
+1. Check wallet balance (minimum 5 SOL required)
+2. Build the Anchor program
+3. Deploy or upgrade the program
+4. Upload IDL to chain
+5. Update Anchor.toml with program ID
+6. Copy IDL to frontend
+
+### Deployment Checklist
+
+- [ ] Configure `.env` with API keys
+- [ ] Fund deployer wallet: `solana airdrop 5 --url devnet`
+- [ ] Run `pnpm deploy:devnet`
+- [ ] Run `pnpm setup:vault` to create test vault
+- [ ] Update frontend `.env` with `NEXT_PUBLIC_PROGRAM_ID`
+- [ ] Run `pnpm --filter runtime migrate` for database
+- [ ] Start runtime: `pnpm --filter runtime dev`
+- [ ] Start frontend: `pnpm --filter app dev`
+
+### Program Addresses
+
+| Network | Program ID |
+|---------|------------|
+| Devnet | `AgVt1111111111111111111111111111111111111111` |
+| Mainnet | TBD |
+
 ## Roadmap
 
 ### Phase 1: Foundation ✅
