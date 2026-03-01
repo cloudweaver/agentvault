@@ -39,3 +39,4 @@ coverage/
 # Misc
 *.pem
 .vercel
+*.log\n.env.local\n.turbo\ncoverage

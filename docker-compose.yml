@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  runtime:
+    build:
+      context: .
+      target: runtime
+    env_file: .env
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  app:
+    build:
+      context: .
+      target: app
+    env_file: .env
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
