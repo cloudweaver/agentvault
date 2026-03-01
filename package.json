@@ -16,7 +16,11 @@
     "test:integration": "anchor test",
     "lint": "pnpm -r lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
-    "clean": "pnpm -r clean && rm -rf node_modules"
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "deploy:devnet": "bash scripts/deploy-devnet.sh",
+    "deploy:mainnet": "echo 'Mainnet deployment not yet configured'",
+    "setup:vault": "tsx scripts/setup-test-vault.ts",
+    "generate:types": "bash scripts/generate-types.sh"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
