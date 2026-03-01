@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.jpg" alt="AgentVault - Your Personal AI Agent Wallet on Solana" width="100%" />
+<img src="assets/banner.svg" alt="AgentVault - Your Personal AI Agent Wallet on Solana" width="100%" />
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Solana](https://img.shields.io/badge/Solana-1.18+-purple.svg)](https://solana.com)

@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0f0d"/>
+      <stop offset="50%" style="stop-color:#0d1512"/>
+      <stop offset="100%" style="stop-color:#0a0f0d"/>
+    </linearGradient>
+    
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d992"/>
+      <stop offset="50%" style="stop-color:#00ffaa"/>
+      <stop offset="100%" style="stop-color:#00d992"/>
+      <animate attributeName="x1" values="0%;100%;0%" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="x2" values="100%;200%;100%" dur="4s" repeatCount="indefinite"/>
+    </linearGradient>
+    
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d992;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#00d992;stop-opacity:0"/>
+    </linearGradient>
+    
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#bgGrad)"/>
+  
+  <!-- Animated grid -->
+  <g opacity="0.1">
+    <g stroke="#00d992" stroke-width="0.5">
+      <line x1="0" y1="100" x2="1200" y2="100"/>
+      <line x1="0" y1="200" x2="1200" y2="200"/>
+      <line x1="0" y1="300" x2="1200" y2="300"/>
+      <line x1="200" y1="0" x2="200" y2="400"/>
+      <line x1="400" y1="0" x2="400" y2="400"/>
+      <line x1="600" y1="0" x2="600" y2="400"/>
+      <line x1="800" y1="0" x2="800" y2="400"/>
+      <line x1="1000" y1="0" x2="1000" y2="400"/>
+    </g>
+  </g>
+  
+  <!-- Animated particles -->
+  <g fill="#00d992" filter="url(#glow)">
+    <!-- Particle 1 -->
+    <circle r="3" opacity="0.8">
+      <animate attributeName="cx" values="100;300;500;300;100" dur="12s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="100;150;100;50;100" dur="12s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Particle 2 -->
+    <circle r="2" opacity="0.6">
+      <animate attributeName="cx" values="900;1100;900;700;900" dur="10s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="300;250;200;250;300" dur="10s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Particle 3 -->
+    <circle r="4" opacity="0.5">
+      <animate attributeName="cx" values="150;250;350;250;150" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="300;320;280;260;300" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.2;0.7;0.2" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Particle 4 -->
+    <circle r="2.5" opacity="0.7">
+      <animate attributeName="cx" values="1050;950;850;950;1050" dur="9s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="80;120;100;60;80" dur="9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Particle 5 -->
+    <circle r="3" opacity="0.6">
+      <animate attributeName="cx" values="600;700;650;550;600" dur="11s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="350;320;370;340;350" dur="11s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3.5s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Particle 6 -->
+    <circle r="2" opacity="0.5">
+      <animate attributeName="cx" values="50;150;100;50" dur="7s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="200;180;220;200" dur="7s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Particle 7 -->
+    <circle r="3.5" opacity="0.4">
+      <animate attributeName="cx" values="1150;1100;1050;1100;1150" dur="13s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="180;220;200;160;180" dur="13s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Connecting lines (animated) -->
+  <g stroke="#00d992" stroke-width="1" opacity="0.15">
+    <line x1="100" y1="100" x2="300" y2="150">
+      <animate attributeName="opacity" values="0.05;0.2;0.05" dur="4s" repeatCount="indefinite"/>
+    </line>
+    <line x1="900" y1="300" x2="1050" y2="80">
+      <animate attributeName="opacity" values="0.1;0.25;0.1" dur="5s" repeatCount="indefinite"/>
+    </line>
+    <line x1="150" y1="300" x2="600" y2="350">
+      <animate attributeName="opacity" values="0.05;0.15;0.05" dur="6s" repeatCount="indefinite"/>
+    </line>
+  </g>
+  
+  <!-- Glowing orb behind text -->
+  <ellipse cx="600" cy="200" rx="300" ry="120" fill="url(#glowGrad)" filter="url(#softGlow)">
+    <animate attributeName="rx" values="280;320;280" dur="6s" repeatCount="indefinite"/>
+    <animate attributeName="ry" values="100;140;100" dur="6s" repeatCount="indefinite"/>
+  </ellipse>
+  
+  <!-- Main title -->
+  <text x="600" y="180" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="url(#textGrad)" filter="url(#glow)" letter-spacing="-2">
+    AgentVault
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="240" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#8ba89e" letter-spacing="1">
+    Your Personal AI Agent Wallet on Solana
+  </text>
+  
+  <!-- Animated underline -->
+  <rect x="350" y="260" width="500" height="2" fill="#00d992" opacity="0.6" rx="1">
+    <animate attributeName="width" values="0;500;500;0" dur="4s" repeatCount="indefinite"/>
+    <animate attributeName="x" values="600;350;350;600" dur="4s" repeatCount="indefinite"/>
+  </rect>
+  
+  <!-- Feature badges -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#00d992">
+    <g opacity="0.9">
+      <rect x="300" y="300" width="120" height="32" rx="16" fill="none" stroke="#00d992" stroke-width="1" opacity="0.5">
+        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/>
+      </rect>
+      <text x="360" y="321" text-anchor="middle" fill="#00d992">💬 Natural</text>
+    </g>
+    <g opacity="0.9">
+      <rect x="440" y="300" width="120" height="32" rx="16" fill="none" stroke="#00d992" stroke-width="1" opacity="0.5">
+        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="0.5s"/>
+      </rect>
+      <text x="500" y="321" text-anchor="middle" fill="#00d992">🛡️ Secure</text>
+    </g>
+    <g opacity="0.9">
+      <rect x="580" y="300" width="140" height="32" rx="16" fill="none" stroke="#00d992" stroke-width="1" opacity="0.5">
+        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="1s"/>
+      </rect>
+      <text x="650" y="321" text-anchor="middle" fill="#00d992">⚡ Autonomous</text>
+    </g>
+    <g opacity="0.9">
+      <rect x="740" y="300" width="150" height="32" rx="16" fill="none" stroke="#00d992" stroke-width="1" opacity="0.5">
+        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="1.5s"/>
+      </rect>
+      <text x="815" y="321" text-anchor="middle" fill="#00d992">📊 Transparent</text>
+    </g>
+  </g>
+  
+  <!-- Solana logo hint -->
+  <g transform="translate(1100, 350)" opacity="0.6">
+    <text font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#8ba89e">Built on</text>
+    <text y="16" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#00d992">Solana</text>
+  </g>
+  
+  <!-- Corner accents -->
+  <path d="M0,0 L60,0 L60,5 L5,5 L5,60 L0,60 Z" fill="#00d992" opacity="0.3"/>
+  <path d="M1200,0 L1140,0 L1140,5 L1195,5 L1195,60 L1200,60 Z" fill="#00d992" opacity="0.3"/>
+  <path d="M0,400 L60,400 L60,395 L5,395 L5,340 L0,340 Z" fill="#00d992" opacity="0.3"/>
+  <path d="M1200,400 L1140,400 L1140,395 L1195,395 L1195,340 L1200,340 Z" fill="#00d992" opacity="0.3"/>
+</svg>
