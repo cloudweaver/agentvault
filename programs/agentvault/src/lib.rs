@@ -54,6 +54,11 @@ pub mod agentvault {
         instructions::execute_stake::handler(ctx, amount)
     }
 
+    /// Supply assets to a lending protocol (agent-signed)
+    pub fn execute_lend(ctx: Context<ExecuteLend>, amount: u64) -> Result<()> {
+        instructions::execute_lend::handler(ctx, amount)
+    }
+
     /// Withdraw funds from the vault (user-signed only)
     pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         instructions::withdraw::handler(ctx, amount)
