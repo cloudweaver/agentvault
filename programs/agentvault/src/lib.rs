@@ -43,20 +43,25 @@ pub mod agentvault {
     /// Execute a token swap via Jupiter (agent-signed)
     pub fn execute_swap(
         ctx: Context<ExecuteSwap>,
-        amount_in: u64,
-        minimum_amount_out: u64,
+        params: instructions::execute_swap::SwapParams,
     ) -> Result<()> {
-        instructions::execute_swap::handler(ctx, amount_in, minimum_amount_out)
+        instructions::execute_swap::handler(ctx, params)
     }
 
     /// Stake SOL to a liquid staking protocol (agent-signed)
-    pub fn execute_stake(ctx: Context<ExecuteStake>, amount: u64) -> Result<()> {
-        instructions::execute_stake::handler(ctx, amount)
+    pub fn execute_stake(
+        ctx: Context<ExecuteStake>,
+        params: instructions::execute_stake::StakeParams,
+    ) -> Result<()> {
+        instructions::execute_stake::handler(ctx, params)
     }
 
     /// Supply assets to a lending protocol (agent-signed)
-    pub fn execute_lend(ctx: Context<ExecuteLend>, amount: u64) -> Result<()> {
-        instructions::execute_lend::handler(ctx, amount)
+    pub fn execute_lend(
+        ctx: Context<ExecuteLend>,
+        params: instructions::execute_lend::LendParams,
+    ) -> Result<()> {
+        instructions::execute_lend::handler(ctx, params)
     }
 
     /// Withdraw funds from the vault (user-signed only)

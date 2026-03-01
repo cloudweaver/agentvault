@@ -18,6 +18,11 @@ export interface ActionPlan {
   operations: Operation[];
   reasoning: string;
   estimatedGas: number;
+  status?: 'pending' | 'pending_approval' | 'executing' | 'completed' | 'failed';
+  executionResults?: {
+    signatures: string[];
+    success: boolean;
+  };
   createdAt: Date;
 }
 
@@ -118,7 +123,7 @@ export interface Position {
   amount: bigint;
   decimals: number;
   valueUsd: number;
-  valueSol: number;
+  valueSol?: number;
   percentOfPortfolio: number;
 }
 
@@ -152,9 +157,13 @@ export interface Trigger {
 export type TriggerType = 'price' | 'time' | 'portfolio' | 'event';
 
 export interface TriggerCondition {
+  id: string;
+  type: TriggerType;
   field: string;
   operator: 'gt' | 'lt' | 'eq' | 'gte' | 'lte';
   value: number | string;
+  action?: TriggerAction;
+  enabled: boolean;
 }
 
 export interface TriggerAction {

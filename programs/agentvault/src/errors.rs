@@ -58,4 +58,19 @@ pub enum AgentVaultError {
 
     #[msg("Invalid epoch for performance recording")]
     InvalidEpoch,
+
+    #[msg("Invalid token account ownership")]
+    InvalidTokenAccount,
+
+    #[msg("Invalid Jupiter program ID")]
+    InvalidJupiterProgram,
+
+    #[msg("Invalid Marinade program ID")]
+    InvalidMarinadeProgram,
+
+    #[msg("Invalid lending protocol program ID")]
+    InvalidLendingProgram,
+
+    #[msg("CPI call to external program failed")]
+    CpiCallFailed,
 }
