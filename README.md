@@ -500,6 +500,20 @@ The deployment script will:
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
+## Contributors
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/cloudweaver">
+        <img src="https://github.com/cloudweaver.png" width="80px;" alt="cloudweaver"/><br />
+        <sub><b>cloudweaver</b></sub>
+      </a><br />
+      <sub>Creator & Lead</sub>
+    </td>
+  </tr>
+</table>
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
