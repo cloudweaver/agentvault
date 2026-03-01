@@ -6,7 +6,7 @@
   <title>AgentVault - Personal AI Wallet on Solana</title>
   <meta name="description" content="Autonomous DeFi management with AI agents on Solana. Swap, stake, lend - all through natural language.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <style>
     /* Animated Network Background */
     #network-bg {
@@ -73,7 +73,7 @@
       border-bottom: 1px solid var(--border);
     }
     header .container { display: flex; align-items: center; justify-content: space-between; }
-    .logo { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 1.25rem; }
+    .logo { display: flex; align-items: center; gap: 12px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.5rem; letter-spacing: -0.5px; color: var(--accent); text-decoration: none; }
     .logo img { height: 32px; border-radius: 8px; }
     nav { display: flex; align-items: center; gap: 32px; }
     nav a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
@@ -163,123 +163,201 @@
     .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--accent); }
     .stat-label { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
     
-    /* Demo Section */
+    /* Demo Section - Jupiter Style */
     #demo { background: var(--bg-secondary); }
-    .demo-container {
-      display: grid;
-      grid-template-columns: 350px 1fr;
-      gap: 24px;
+    .demo-app {
       margin-top: 60px;
-    }
-    @media (max-width: 1024px) { .demo-container { grid-template-columns: 1fr; } }
-    
-    .demo-sidebar { display: flex; flex-direction: column; gap: 20px; }
-    .demo-card {
+      display: flex;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 24px;
+      overflow: hidden;
+      height: 650px;
     }
-    .demo-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .demo-card-title { font-weight: 600; font-size: 15px; }
-    .badge { padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 500; }
-    .badge-green { background: rgba(0, 217, 146, 0.15); color: var(--accent); }
+    @media (max-width: 1024px) { .demo-app { flex-direction: column; height: auto; } }
     
-    .portfolio-value { text-align: center; padding: 24px 0; }
-    .portfolio-value .amount { font-size: 2.5rem; font-weight: 700; }
-    .portfolio-value .change { color: var(--accent); font-size: 14px; margin-top: 4px; }
-    
-    .token-list { display: flex; flex-direction: column; gap: 12px; }
-    .token-row {
+    /* App Sidebar */
+    .app-sidebar {
+      width: 180px;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    @media (max-width: 1024px) { .app-sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 16px; } }
+    .app-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+      margin-bottom: 28px;
+      padding: 4px 0;
+    }
+    @media (max-width: 1024px) { .app-logo { margin-bottom: 0; } }
+    .app-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    @media (max-width: 1024px) { .app-nav { flex-direction: row; gap: 8px; flex: none; } }
+    .nav-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 14px;
-      background: var(--bg-secondary);
-      border-radius: 12px;
+      gap: 10px;
+      transition: all 0.15s;
     }
-    .token-info { display: flex; align-items: center; gap: 12px; }
-    .token-icon {
-      width: 36px;
-      height: 36px;
+    .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+    .nav-item.active { background: rgba(0, 217, 146, 0.1); color: var(--accent); }
+    .nav-icon { font-size: 14px; opacity: 0.8; }
+    .wallet-badge {
+      margin-top: auto;
+      padding: 12px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 1024px) { .wallet-badge { margin-top: 0; margin-left: auto; } }
+    .wallet-addr { font-size: 11px; color: var(--text-muted); }
+    .wallet-status { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 11px; color: var(--accent); }
+    .status-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+    
+    /* App Main */
+    .app-main { flex: 1; display: flex; overflow: hidden; }
+    @media (max-width: 1024px) { .app-main { flex-direction: column; } }
+    
+    /* Portfolio Panel */
+    .panel-portfolio {
+      width: 300px;
+      border-right: 1px solid var(--border);
+      padding: 20px;
+      overflow-y: auto;
+      background: var(--bg-card);
+    }
+    @media (max-width: 1024px) { .panel-portfolio { width: 100%; border-right: none; border-bottom: 1px solid var(--border); } }
+    .balance-card {
+      background: linear-gradient(135deg, rgba(0,217,146,0.08) 0%, rgba(0,217,146,0.02) 100%);
+      border: 1px solid rgba(0,217,146,0.15);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .balance-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 8px; }
+    .balance-amount { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+    .balance-change { font-size: 12px; color: var(--accent); margin-top: 6px; }
+    .section-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 12px; margin-top: 8px; }
+    .asset-list { display: flex; flex-direction: column; gap: 2px; }
+    .asset-row {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.02);
+      transition: background 0.15s;
+    }
+    .asset-row:hover { background: rgba(255,255,255,0.04); }
+    .asset-icon {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 12px;
+      margin-right: 12px;
     }
-    .token-icon.sol { background: linear-gradient(135deg, #9945FF, #14F195); }
-    .token-icon.usdc { background: linear-gradient(135deg, #2775CA, #00D4AA); }
-    .token-icon.msol { background: linear-gradient(135deg, #00D4AA, #0066FF); }
-    .token-name { font-weight: 500; font-size: 14px; }
-    .token-balance { font-size: 12px; color: var(--text-muted); }
-    .token-value { text-align: right; }
-    .token-usd { font-weight: 500; font-size: 14px; }
-    .token-change { font-size: 12px; color: var(--accent); }
-    
-    /* Chat */
-    .chat-container {
-      background: var(--bg-card);
+    .asset-icon.sol { background: linear-gradient(135deg, #9945FF, #14F195); color: #fff; }
+    .asset-icon.usdc { background: #2775CA; color: #fff; }
+    .asset-icon.msol { background: #308D8A; color: #fff; }
+    .asset-info { flex: 1; }
+    .asset-name { font-weight: 600; font-size: 13px; }
+    .asset-bal { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .asset-value { text-align: right; }
+    .asset-usd { font-weight: 600; font-size: 13px; }
+    .asset-pct { font-size: 11px; margin-top: 2px; }
+    .asset-pct.green { color: var(--accent); }
+    .asset-pct.muted { color: var(--text-muted); }
+    .policy-box {
+      margin-top: 24px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
       border: 1px solid var(--border);
-      border-radius: 16px;
+    }
+    .policy-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .policy-row:last-child { border-bottom: none; }
+    .policy-row span:first-child { color: var(--text-muted); }
+    
+    /* Chat Panel */
+    .panel-chat {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      height: 600px;
+      background: var(--bg-primary);
     }
     .chat-header {
-      padding: 20px 24px;
+      padding: 16px 20px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 10px;
     }
-    .chat-agent { display: flex; align-items: center; gap: 12px; }
-    .chat-avatar {
-      width: 44px;
-      height: 44px;
-      background: var(--accent-glow);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-    .chat-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
-    .chat-status::before { content: ''; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+    .chat-status-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+    .chat-title { font-weight: 600; font-size: 13px; }
+    .chat-powered { font-size: 11px; color: var(--text-muted); margin-left: auto; }
     
-    .chat-messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
-    .message { max-width: 85%; padding: 16px 20px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
-    .message-agent { background: var(--bg-secondary); border-bottom-left-radius: 4px; align-self: flex-start; }
-    .message-user { background: var(--accent); color: var(--bg-primary); border-bottom-right-radius: 4px; align-self: flex-end; }
-    .message-time { font-size: 11px; opacity: 0.6; margin-top: 8px; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .message { max-width: 85%; padding: 14px 16px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+    .message-agent {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+      align-self: flex-start;
+    }
+    .message-user {
+      background: var(--accent);
+      color: var(--bg-primary);
+      border-bottom-right-radius: 4px;
+      align-self: flex-end;
+    }
+    .message-time { font-size: 10px; color: var(--text-muted); margin-top: 8px; }
     .message-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
     
-    .chat-suggestions { padding: 12px 24px; border-top: 1px solid var(--border); }
-    .suggestions-label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .suggestions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .suggestion {
+    .quick-actions { padding: 0 20px 12px; }
+    .quick-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 8px; }
+    .quick-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .quick-btn {
       padding: 8px 14px;
-      background: var(--bg-secondary);
+      background: rgba(255,255,255,0.04);
       border: 1px solid var(--border);
-      border-radius: 100px;
-      font-size: 13px;
+      border-radius: 20px;
+      font-size: 12px;
       color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
+      font-family: inherit;
     }
-    .suggestion:hover { background: var(--bg-card-hover); border-color: var(--accent); color: var(--text-primary); }
+    .quick-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: var(--text-primary); }
     
-    .chat-input-area { padding: 16px 24px; border-top: 1px solid var(--border); }
+    .chat-input-area { padding: 16px 20px; border-top: 1px solid var(--border); }
     .chat-input-form { display: flex; gap: 12px; }
     .chat-input {
       flex: 1;
-      background: var(--bg-secondary);
+      background: rgba(255,255,255,0.04);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 14px;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
       color: var(--text-primary);
       outline: none;
       font-family: inherit;
@@ -335,24 +413,7 @@
   <canvas id="network-bg"></canvas>
   <header>
     <div class="container">
-      <a href="#" class="logo">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="8" fill="url(#logo-grad)"/>
-          <path d="M16 6L8 10V16C8 21.52 11.84 26.74 16 28C20.16 26.74 24 21.52 24 16V10L16 6Z" stroke="#0a0f0d" stroke-width="1.5" fill="none"/>
-          <circle cx="16" cy="15" r="3" stroke="#0a0f0d" stroke-width="1.5"/>
-          <path d="M16 18V21" stroke="#0a0f0d" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="22" cy="8" r="4" fill="#0a0f0d"/>
-          <circle cx="22" cy="8" r="2.5" stroke="#00d992" stroke-width="1"/>
-          <path d="M21 8H23M22 7V9" stroke="#00d992" stroke-width="0.75" stroke-linecap="round"/>
-          <defs>
-            <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32">
-              <stop offset="0%" stop-color="#00d992"/>
-              <stop offset="100%" stop-color="#00a67d"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span>AgentVault</span>
-      </a>
+      <a href="#" class="logo">AgentVault</a>
       <nav>
         <a href="#features">Features</a>
         <a href="#demo">Demo</a>
@@ -444,136 +505,99 @@
       <h2 class="text-gradient">Interactive Demo</h2>
       <p class="text-muted">Try the agent interface. No wallet needed.</p>
 
-      <div class="demo-container">
-        <div class="demo-sidebar">
-          <div class="demo-card">
-            <div class="demo-card-header">
-              <span class="demo-card-title">Demo Wallet</span>
-              <span class="badge badge-green">Connected</span>
-            </div>
-            <div style="background: var(--bg-secondary); border-radius: 10px; padding: 12px; margin-bottom: 16px;">
-              <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Vault Address</div>
-              <div class="mono" style="font-size: 13px; color: var(--text-secondary);">7xKXt...demoVault</div>
-            </div>
-            <div class="portfolio-value">
-              <div class="amount">$2,847.32</div>
-              <div class="change">+$127.45 (4.7%) today</div>
-            </div>
-          </div>
-
-          <div class="demo-card">
-            <div class="demo-card-header">
-              <span class="demo-card-title">Portfolio</span>
-            </div>
-            <div class="token-list">
-              <div class="token-row">
-                <div class="token-info">
-                  <div class="token-icon sol">◎</div>
-                  <div>
-                    <div class="token-name">SOL</div>
-                    <div class="token-balance">12.5 SOL</div>
-                  </div>
-                </div>
-                <div class="token-value">
-                  <div class="token-usd">$1,562</div>
-                  <div class="token-change">+5.2%</div>
-                </div>
-              </div>
-              <div class="token-row">
-                <div class="token-info">
-                  <div class="token-icon usdc">$</div>
-                  <div>
-                    <div class="token-name">USDC</div>
-                    <div class="token-balance">750.00</div>
-                  </div>
-                </div>
-                <div class="token-value">
-                  <div class="token-usd">$750</div>
-                  <div class="token-change" style="color: var(--text-muted);">Stable</div>
-                </div>
-              </div>
-              <div class="token-row">
-                <div class="token-info">
-                  <div class="token-icon msol">m</div>
-                  <div>
-                    <div class="token-name">mSOL</div>
-                    <div class="token-balance">4.2 mSOL</div>
-                  </div>
-                </div>
-                <div class="token-value">
-                  <div class="token-usd">$535</div>
-                  <div class="token-change">6.8% APY</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="demo-card">
-            <div class="demo-card-header">
-              <span class="demo-card-title">Active Policy</span>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
-              <div style="display: flex; justify-content: space-between;">
-                <span style="color: var(--text-muted);">Daily Limit</span>
-                <span>20 SOL</span>
-              </div>
-              <div style="display: flex; justify-content: space-between;">
-                <span style="color: var(--text-muted);">Per Transaction</span>
-                <span>5 SOL</span>
-              </div>
-              <div style="display: flex; justify-content: space-between;">
-                <span style="color: var(--text-muted);">Max Slippage</span>
-                <span>1%</span>
-              </div>
-              <div style="display: flex; justify-content: space-between;">
-                <span style="color: var(--text-muted);">Auto-Execute</span>
-                <span style="color: var(--accent);">Price triggers</span>
-              </div>
-            </div>
+      <div class="demo-app">
+        <!-- Sidebar -->
+        <div class="app-sidebar">
+          <div class="app-logo">AgentVault</div>
+          <nav class="app-nav">
+            <a class="nav-item active"><span class="nav-icon">◆</span> Dashboard</a>
+            <a class="nav-item"><span class="nav-icon">↗</span> Swap</a>
+            <a class="nav-item"><span class="nav-icon">◎</span> Stake</a>
+            <a class="nav-item"><span class="nav-icon">⚡</span> Lend</a>
+            <a class="nav-item"><span class="nav-icon">☰</span> History</a>
+            <a class="nav-item"><span class="nav-icon">⚙</span> Settings</a>
+          </nav>
+          <div class="wallet-badge">
+            <div class="wallet-addr mono">7xKXt...demoVault</div>
+            <div class="wallet-status"><span class="status-dot"></span> Connected</div>
           </div>
         </div>
 
-        <div class="chat-container">
-          <div class="chat-header">
-            <div class="chat-agent">
-              <div class="chat-avatar">🤖</div>
-              <div>
-                <div style="font-weight: 600;">AgentVault</div>
-                <div style="font-size: 12px; color: var(--text-muted);">Powered by Claude</div>
+        <!-- Main Area -->
+        <div class="app-main">
+          <!-- Portfolio Panel -->
+          <div class="panel-portfolio">
+            <div class="balance-card">
+              <div class="balance-label">TOTAL BALANCE</div>
+              <div class="balance-amount">$2,847.32</div>
+              <div class="balance-change">↑ $127.45 (4.7%) today</div>
+            </div>
+
+            <div class="section-label">ASSETS</div>
+            <div class="asset-list">
+              <div class="asset-row">
+                <div class="asset-icon sol">◎</div>
+                <div class="asset-info"><div class="asset-name">SOL</div><div class="asset-bal">12.5 SOL</div></div>
+                <div class="asset-value"><div class="asset-usd">$1,562</div><div class="asset-pct green">+5.2%</div></div>
+              </div>
+              <div class="asset-row">
+                <div class="asset-icon usdc">$</div>
+                <div class="asset-info"><div class="asset-name">USDC</div><div class="asset-bal">750.00</div></div>
+                <div class="asset-value"><div class="asset-usd">$750</div><div class="asset-pct muted">Stable</div></div>
+              </div>
+              <div class="asset-row">
+                <div class="asset-icon msol">m</div>
+                <div class="asset-info"><div class="asset-name">mSOL</div><div class="asset-bal">4.2 mSOL</div></div>
+                <div class="asset-value"><div class="asset-usd">$535</div><div class="asset-pct green">6.8% APY</div></div>
               </div>
             </div>
-            <div class="chat-status">Online</div>
-          </div>
 
-          <div class="chat-messages" id="messages">
-            <div class="message message-agent">
-              <div>👋 Welcome! I'm your AgentVault assistant.</div>
-              <div style="margin-top: 12px;">I can help you:</div>
-              <ul style="margin: 8px 0 0 20px; color: var(--text-secondary);">
-                <li>Swap tokens via Jupiter</li>
-                <li>Stake SOL with Marinade</li>
-                <li>Lend assets on MarginFi</li>
-                <li>Set price alerts</li>
-              </ul>
-              <div class="message-time">Just now</div>
+            <div class="policy-box">
+              <div class="section-label" style="margin-top:0">ACTIVE POLICY</div>
+              <div class="policy-row"><span>Daily Limit</span><span>20 SOL</span></div>
+              <div class="policy-row"><span>Per Transaction</span><span>5 SOL</span></div>
+              <div class="policy-row"><span>Max Slippage</span><span>1%</span></div>
+              <div class="policy-row"><span>Auto-Approve</span><span class="text-accent">Enabled</span></div>
             </div>
           </div>
 
-          <div class="chat-suggestions">
-            <div class="suggestions-label">Try these</div>
-            <div class="suggestions">
-              <button class="suggestion" onclick="send('Swap 1 SOL to USDC')">Swap 1 SOL to USDC</button>
-              <button class="suggestion" onclick="send('Stake 2 SOL')">Stake 2 SOL</button>
-              <button class="suggestion" onclick="send('Portfolio summary')">Portfolio</button>
-              <button class="suggestion" onclick="send('Set price alert')">Price alert</button>
+          <!-- Chat Panel -->
+          <div class="panel-chat">
+            <div class="chat-header">
+              <div class="chat-status-dot"></div>
+              <span class="chat-title">Agent</span>
+              <span class="chat-powered">Powered by Claude</span>
             </div>
-          </div>
 
-          <div class="chat-input-area">
-            <form class="chat-input-form" onsubmit="handleSubmit(event)">
-              <input type="text" class="chat-input" id="input" placeholder="Tell me what you want to do...">
-              <button type="submit" class="btn btn-primary">Send</button>
-            </form>
+            <div class="chat-messages" id="messages">
+              <div class="message message-agent">
+                <div>👋 Welcome to AgentVault. I can help you manage your portfolio:</div>
+                <ul style="margin: 10px 0 0 18px; color: var(--text-secondary); font-size: 13px;">
+                  <li>Swap tokens via Jupiter</li>
+                  <li>Stake SOL with Marinade</li>
+                  <li>Lend assets on MarginFi</li>
+                  <li>Set price alerts</li>
+                </ul>
+                <div class="message-time">Just now</div>
+              </div>
+            </div>
+
+            <div class="quick-actions">
+              <div class="quick-label">TRY THESE</div>
+              <div class="quick-btns">
+                <button class="quick-btn" onclick="send('Swap 1 SOL to USDC')">Swap 1 SOL → USDC</button>
+                <button class="quick-btn" onclick="send('Stake 2 SOL')">Stake 2 SOL</button>
+                <button class="quick-btn" onclick="send('Portfolio summary')">Portfolio</button>
+                <button class="quick-btn" onclick="send('Set price alert')">Price alert</button>
+              </div>
+            </div>
+
+            <div class="chat-input-area">
+              <form class="chat-input-form" onsubmit="handleSubmit(event)">
+                <input type="text" class="chat-input" id="input" placeholder="Tell me what you want to do...">
+                <button type="submit" class="btn btn-primary">Send</button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -627,17 +651,8 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-brand">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="url(#logo-grad2)"/>
-            <path d="M16 6L8 10V16C8 21.52 11.84 26.74 16 28C20.16 26.74 24 21.52 24 16V10L16 6Z" stroke="#0a0f0d" stroke-width="1.5" fill="none"/>
-            <circle cx="16" cy="15" r="3" stroke="#0a0f0d" stroke-width="1.5"/>
-            <path d="M16 18V21" stroke="#0a0f0d" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="22" cy="8" r="4" fill="#0a0f0d"/>
-            <circle cx="22" cy="8" r="2.5" stroke="#00d992" stroke-width="1"/>
-            <defs><linearGradient id="logo-grad2" x1="0" y1="0" x2="32" y2="32"><stop offset="0%" stop-color="#00d992"/><stop offset="100%" stop-color="#00a67d"/></linearGradient></defs>
-          </svg>
-          <span style="font-weight: 600;">AgentVault</span>
-          <span style="color: var(--text-muted); margin-left: 8px;">Autonomous finance, your rules.</span>
+          <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--accent); letter-spacing: -0.5px;">AgentVault</span>
+          <span style="color: var(--text-muted); margin-left: 12px;">Autonomous finance, your rules.</span>
         </div>
         <div class="footer-links">
           <a href="https://github.com/cloudweaver/agentvault">GitHub</a>
