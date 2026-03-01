@@ -77,3 +77,4 @@ User interfaces for vault management.
 - Next.js web dashboard
 - React Native mobile app
 - REST/WebSocket API
+
