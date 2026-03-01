@@ -6,124 +6,204 @@
   <title>AgentVault - Interactive Demo</title>
   <meta name="description" content="Your Personal AI Agent Wallet on Solana - Interactive Demo">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            vault: {
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            },
-            dark: {
-              100: '#f1f5f9',
-              200: '#e2e8f0',
-              300: '#cbd5e1',
-              400: '#94a3b8',
-              500: '#64748b',
-              600: '#475569',
-              700: '#334155',
-              800: '#1e293b',
-              900: '#0f172a',
-              950: '#020617',
-            }
-          }
-        }
-      }
-    }
-  </script>
   <style>
-    @keyframes pulse-slow {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    .animate-pulse-slow {
-      animation: pulse-slow 2s ease-in-out infinite;
-    }
-    .typing-indicator span {
-      animation: bounce 1.4s infinite ease-in-out both;
-    }
-    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #020617; color: #f1f5f9; min-height: 100vh; }
+    
+    /* Layout */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+    .grid { display: grid; gap: 24px; }
+    .grid-cols-3 { grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .grid-cols-3 { grid-template-columns: 1fr 2fr; } }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .gap-4 { gap: 16px; }
+    .gap-6 { gap: 24px; }
+    .flex-1 { flex: 1; }
+    .flex-wrap { flex-wrap: wrap; }
+    .space-y-3 > * + * { margin-top: 12px; }
+    .space-y-4 > * + * { margin-top: 16px; }
+    .space-y-6 > * + * { margin-top: 24px; }
+    
+    /* Typography */
+    .text-xs { font-size: 12px; }
+    .text-sm { font-size: 14px; }
+    .text-lg { font-size: 18px; }
+    .text-xl { font-size: 20px; }
+    .text-2xl { font-size: 24px; }
+    .text-3xl { font-size: 30px; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .font-medium { font-weight: 500; }
+    .font-mono { font-family: monospace; }
+    .text-white { color: #fff; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .whitespace-pre-wrap { white-space: pre-wrap; }
+    
+    /* Colors */
+    .text-gray-100 { color: #f1f5f9; }
+    .text-gray-300 { color: #cbd5e1; }
+    .text-gray-400 { color: #94a3b8; }
+    .text-gray-500 { color: #64748b; }
+    .text-green-400 { color: #4ade80; }
+    .text-red-400 { color: #f87171; }
+    .text-blue-400 { color: #60a5fa; }
+    .text-purple-400 { color: #a78bfa; }
+    .bg-dark-700 { background: #334155; }
+    .bg-dark-800 { background: #1e293b; }
+    .bg-dark-900 { background: #0f172a; }
+    
+    /* Components */
+    .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; font-size: 12px; }
+    .badge-green { background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.2); color: #4ade80; }
+    .btn { padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #4f46e5; color: white; }
+    .btn-primary:hover { background: #4338ca; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-success:hover { background: #15803d; }
+    .btn-danger { background: rgba(220, 38, 38, 0.8); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-small { padding: 6px 16px; font-size: 12px; }
+    .input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px 16px; font-size: 14px; color: white; outline: none; }
+    .input:focus { border-color: #6366f1; }
+    .input::placeholder { color: #64748b; }
+    
+    /* Header */
+    header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 50; }
+    header .container { padding: 16px; }
+    
+    /* Hero */
+    .hero { background: linear-gradient(to right, rgba(79, 70, 229, 0.2), rgba(168, 85, 247, 0.2)); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+    .hero-tags { display: none; }
+    @media (min-width: 768px) { .hero-tags { display: flex; gap: 8px; } }
+    .tag { padding: 4px 12px; background: rgba(79, 70, 229, 0.2); color: #818cf8; border-radius: 9999px; font-size: 12px; }
+    
+    /* Chat */
+    .chat-container { height: calc(100vh - 320px); min-height: 400px; display: flex; flex-direction: column; }
+    .chat-header { padding: 16px; border-bottom: 1px solid #1e293b; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; }
+    .chat-input-area { padding: 16px; border-top: 1px solid #1e293b; }
+    .message { max-width: 85%; padding: 12px 16px; border-radius: 16px; margin-bottom: 12px; }
+    .message-user { background: #4f46e5; margin-left: auto; border-bottom-right-radius: 4px; }
+    .message-agent { background: #1e293b; border-bottom-left-radius: 4px; }
+    .message-time { font-size: 11px; opacity: 0.6; margin-top: 8px; }
+    
+    /* Suggestions */
+    .suggestions { padding: 8px 16px; border-top: 1px solid #1e293b; }
+    .suggestion-btn { padding: 6px 12px; background: #1e293b; border: none; border-radius: 9999px; font-size: 12px; color: #e2e8f0; cursor: pointer; transition: background 0.2s; }
+    .suggestion-btn:hover { background: #334155; }
+    
+    /* Portfolio */
+    .token-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #1e293b; border-radius: 8px; }
+    .token-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
+    .token-icon-sol { background: linear-gradient(to bottom right, #a855f7, #3b82f6); }
+    .token-icon-usdc { background: linear-gradient(to bottom right, #22c55e, #14b8a6); }
+    .token-icon-msol { background: linear-gradient(to bottom right, #f97316, #ef4444); }
+    
+    /* Activity */
+    .activity-row { display: flex; align-items: center; gap: 16px; padding: 12px; background: #1e293b; border-radius: 8px; }
+    .activity-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .activity-icon-success { background: rgba(74, 222, 128, 0.1); }
+    .activity-icon-info { background: rgba(96, 165, 250, 0.1); }
+    
+    /* Footer */
+    footer { border-top: 1px solid #1e293b; margin-top: 48px; padding: 32px 0; }
+    footer a { color: #94a3b8; text-decoration: none; font-size: 14px; }
+    footer a:hover { color: white; }
+    
+    /* Animations */
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    .typing span { display: inline-block; width: 8px; height: 8px; background: #6366f1; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+    .typing span:nth-child(1) { animation-delay: -0.32s; }
+    .typing span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .animate-pulse { animation: pulse 2s infinite; }
+    .dot-green { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; }
+    
+    /* Actions */
+    .actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #334155; }
+    .hidden { display: none; }
+    
+    /* Lists */
+    ul { list-style: disc; padding-left: 20px; }
+    li { margin: 4px 0; }
   </style>
 </head>
-<body class="bg-dark-950 text-dark-100 min-h-screen">
+<body>
   <!-- Header -->
-  <header class="border-b border-dark-800 bg-dark-900/50 backdrop-blur-xl sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+  <header>
+    <div class="container flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <span class="text-3xl">🏦</span>
+        <span style="font-size: 28px;">🏦</span>
         <div>
           <h1 class="text-xl font-bold text-white">AgentVault</h1>
-          <p class="text-xs text-dark-400">Interactive Demo</p>
+          <p class="text-xs text-gray-400">Interactive Demo</p>
         </div>
       </div>
       <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full">
-          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-          <span class="text-xs text-green-400">Demo Mode</span>
+        <div class="badge badge-green">
+          <span class="dot-green animate-pulse"></span>
+          Demo Mode
         </div>
-        <a href="https://github.com/cloudweaver/agentvault" target="_blank" 
-           class="px-4 py-2 bg-dark-800 hover:bg-dark-700 rounded-lg text-sm transition-colors flex items-center gap-2">
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
+        <a href="https://github.com/cloudweaver/agentvault" target="_blank" class="btn" style="background: #1e293b; padding: 8px 16px;">
+          ⭐ GitHub
         </a>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-6">
-    <!-- Hero Banner -->
-    <div class="bg-gradient-to-r from-vault-600/20 to-purple-600/20 border border-vault-500/20 rounded-2xl p-6 mb-6">
+  <main class="container" style="padding-top: 24px; padding-bottom: 24px;">
+    <!-- Hero -->
+    <div class="hero">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-2xl font-bold text-white mb-2">🤖 AI-Powered DeFi Wallet</h2>
-          <p class="text-dark-300">Chat with your wallet using natural language. Set guardrails, let AI handle the rest.</p>
+          <h2 class="text-2xl font-bold text-white" style="margin-bottom: 8px;">🤖 AI-Powered DeFi Wallet</h2>
+          <p class="text-gray-300">Chat with your wallet using natural language. Set guardrails, let AI handle the rest.</p>
         </div>
-        <div class="hidden md:flex gap-2">
-          <span class="px-3 py-1 bg-vault-600/20 text-vault-400 rounded-full text-sm">Jupiter Swaps</span>
-          <span class="px-3 py-1 bg-vault-600/20 text-vault-400 rounded-full text-sm">Marinade Staking</span>
-          <span class="px-3 py-1 bg-vault-600/20 text-vault-400 rounded-full text-sm">MarginFi Lending</span>
+        <div class="hero-tags">
+          <span class="tag">Jupiter Swaps</span>
+          <span class="tag">Marinade Staking</span>
+          <span class="tag">MarginFi Lending</span>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Portfolio Panel -->
-      <div class="lg:col-span-1 space-y-6">
-        <!-- Wallet Card -->
-        <div class="bg-dark-900 border border-dark-800 rounded-xl p-5">
-          <div class="flex items-center justify-between mb-4">
+    <div class="grid grid-cols-3">
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Wallet -->
+        <div class="card">
+          <div class="flex items-center justify-between" style="margin-bottom: 16px;">
             <h3 class="font-semibold text-white">Demo Wallet</h3>
-            <span class="px-2 py-1 bg-green-500/10 text-green-400 text-xs rounded">Connected</span>
+            <span class="badge badge-green" style="padding: 2px 8px;">Connected</span>
           </div>
-          <div class="bg-dark-800 rounded-lg p-3 mb-4">
-            <p class="text-xs text-dark-400 mb-1">Vault Address</p>
-            <p class="font-mono text-sm text-dark-200 truncate">7xKXt...demo</p>
+          <div style="background: #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+            <p class="text-xs text-gray-400" style="margin-bottom: 4px;">Vault Address</p>
+            <p class="font-mono text-sm text-gray-300 truncate">7xKXtQ9Dp...demoVault</p>
           </div>
-          <div class="text-center py-4">
+          <div class="text-center" style="padding: 16px 0;">
             <p class="text-3xl font-bold text-white">$2,847.32</p>
-            <p class="text-sm text-green-400">+$127.45 (4.7%) today</p>
+            <p class="text-sm text-green-400" style="margin-top: 4px;">+$127.45 (4.7%) today</p>
           </div>
         </div>
 
-        <!-- Portfolio Breakdown -->
-        <div class="bg-dark-900 border border-dark-800 rounded-xl p-5">
-          <h3 class="font-semibold text-white mb-4">Portfolio</h3>
+        <!-- Portfolio -->
+        <div class="card">
+          <h3 class="font-semibold text-white" style="margin-bottom: 16px;">Portfolio</h3>
           <div class="space-y-3">
-            <div class="flex items-center justify-between p-3 bg-dark-800 rounded-lg">
+            <div class="token-row">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-xs font-bold">◎</div>
+                <div class="token-icon token-icon-sol">◎</div>
                 <div>
                   <p class="font-medium text-white">SOL</p>
-                  <p class="text-xs text-dark-400">12.5 SOL</p>
+                  <p class="text-xs text-gray-400">12.5 SOL</p>
                 </div>
               </div>
               <div class="text-right">
@@ -131,25 +211,25 @@
                 <p class="text-xs text-green-400">+5.2%</p>
               </div>
             </div>
-            <div class="flex items-center justify-between p-3 bg-dark-800 rounded-lg">
+            <div class="token-row">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center text-xs font-bold">$</div>
+                <div class="token-icon token-icon-usdc">$</div>
                 <div>
                   <p class="font-medium text-white">USDC</p>
-                  <p class="text-xs text-dark-400">750.00 USDC</p>
+                  <p class="text-xs text-gray-400">750.00 USDC</p>
                 </div>
               </div>
               <div class="text-right">
                 <p class="font-medium text-white">$750.00</p>
-                <p class="text-xs text-dark-400">Stable</p>
+                <p class="text-xs text-gray-400">Stable</p>
               </div>
             </div>
-            <div class="flex items-center justify-between p-3 bg-dark-800 rounded-lg">
+            <div class="token-row">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-xs font-bold">m</div>
+                <div class="token-icon token-icon-msol">m</div>
                 <div>
                   <p class="font-medium text-white">mSOL</p>
-                  <p class="text-xs text-dark-400">4.2 mSOL (staked)</p>
+                  <p class="text-xs text-gray-400">4.2 mSOL</p>
                 </div>
               </div>
               <div class="text-right">
@@ -160,434 +240,277 @@
           </div>
         </div>
 
-        <!-- Policy Summary -->
-        <div class="bg-dark-900 border border-dark-800 rounded-xl p-5">
-          <h3 class="font-semibold text-white mb-4">Active Policy</h3>
-          <div class="space-y-2 text-sm">
+        <!-- Policy -->
+        <div class="card">
+          <h3 class="font-semibold text-white" style="margin-bottom: 16px;">Active Policy</h3>
+          <div class="text-sm space-y-3">
             <div class="flex justify-between">
-              <span class="text-dark-400">Daily Limit</span>
-              <span class="text-white">20 SOL ($2,500)</span>
+              <span class="text-gray-400">Daily Limit</span>
+              <span class="text-white">20 SOL</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-dark-400">Per Transaction</span>
-              <span class="text-white">5 SOL ($625)</span>
+              <span class="text-gray-400">Per Transaction</span>
+              <span class="text-white">5 SOL</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-dark-400">Max Slippage</span>
+              <span class="text-gray-400">Max Slippage</span>
               <span class="text-white">1%</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-dark-400">Auto-Execute</span>
-              <span class="text-green-400">Price triggers only</span>
+              <span class="text-gray-400">Auto-Execute</span>
+              <span class="text-green-400">Price triggers</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Chat Interface -->
-      <div class="lg:col-span-2">
-        <div class="bg-dark-900 border border-dark-800 rounded-xl h-[calc(100vh-280px)] flex flex-col">
-          <!-- Chat Header -->
-          <div class="p-4 border-b border-dark-800 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-vault-600 rounded-full flex items-center justify-center">
-                <span class="text-xl">🤖</span>
-              </div>
-              <div>
-                <p class="font-semibold text-white">AgentVault Assistant</p>
-                <p class="text-xs text-dark-400">Powered by Claude</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-              <span class="text-xs text-dark-400">Online</span>
+      <!-- Chat -->
+      <div class="card chat-container">
+        <div class="chat-header flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div style="width: 40px; height: 40px; background: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">🤖</div>
+            <div>
+              <p class="font-semibold text-white">AgentVault Assistant</p>
+              <p class="text-xs text-gray-400">Powered by Claude</p>
             </div>
           </div>
+          <div class="flex items-center gap-2">
+            <span class="dot-green"></span>
+            <span class="text-xs text-gray-400">Online</span>
+          </div>
+        </div>
 
-          <!-- Messages -->
-          <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-messages">
-            <!-- Welcome message -->
-            <div class="flex justify-start">
-              <div class="max-w-[85%] bg-dark-800 rounded-2xl rounded-tl-md px-4 py-3">
-                <p class="text-sm text-dark-100">👋 Welcome to AgentVault! I'm your AI-powered DeFi assistant.</p>
-                <p class="text-sm text-dark-100 mt-2">I can help you:</p>
-                <ul class="text-sm text-dark-300 mt-1 ml-4 list-disc">
-                  <li>Swap tokens via Jupiter</li>
-                  <li>Stake SOL with Marinade</li>
-                  <li>Lend assets on MarginFi</li>
-                  <li>Set price alerts and triggers</li>
-                </ul>
-                <p class="text-sm text-dark-100 mt-2">Try clicking one of the suggestions below, or type your own command!</p>
-                <p class="text-xs text-dark-500 mt-2">Just now</p>
-              </div>
-            </div>
+        <div class="chat-messages" id="messages">
+          <div class="message message-agent">
+            <p class="text-sm">👋 Welcome to AgentVault! I'm your AI-powered DeFi assistant.</p>
+            <p class="text-sm" style="margin-top: 8px;">I can help you:</p>
+            <ul class="text-sm text-gray-300" style="margin-top: 4px;">
+              <li>Swap tokens via Jupiter</li>
+              <li>Stake SOL with Marinade</li>
+              <li>Lend assets on MarginFi</li>
+              <li>Set price alerts</li>
+            </ul>
+            <p class="text-sm" style="margin-top: 8px;">Try the suggestions below! 👇</p>
+            <p class="message-time">Just now</p>
           </div>
+        </div>
 
-          <!-- Quick Actions -->
-          <div class="px-4 py-2 border-t border-dark-800">
-            <p class="text-xs text-dark-500 mb-2">Try these:</p>
-            <div class="flex flex-wrap gap-2">
-              <button onclick="sendSuggestion('Swap 1 SOL to USDC')" class="px-3 py-1.5 bg-dark-800 hover:bg-dark-700 rounded-full text-xs text-dark-200 transition-colors">
-                Swap 1 SOL to USDC
-              </button>
-              <button onclick="sendSuggestion('Stake 2 SOL with Marinade')" class="px-3 py-1.5 bg-dark-800 hover:bg-dark-700 rounded-full text-xs text-dark-200 transition-colors">
-                Stake 2 SOL with Marinade
-              </button>
-              <button onclick="sendSuggestion('What\'s my portfolio worth?')" class="px-3 py-1.5 bg-dark-800 hover:bg-dark-700 rounded-full text-xs text-dark-200 transition-colors">
-                Portfolio summary
-              </button>
-              <button onclick="sendSuggestion('Set alert when SOL drops below $100')" class="px-3 py-1.5 bg-dark-800 hover:bg-dark-700 rounded-full text-xs text-dark-200 transition-colors">
-                Set price alert
-              </button>
-            </div>
+        <div class="suggestions">
+          <p class="text-xs text-gray-500" style="margin-bottom: 8px;">Try these:</p>
+          <div class="flex flex-wrap gap-2">
+            <button class="suggestion-btn" onclick="send('Swap 1 SOL to USDC')">Swap 1 SOL to USDC</button>
+            <button class="suggestion-btn" onclick="send('Stake 2 SOL with Marinade')">Stake 2 SOL</button>
+            <button class="suggestion-btn" onclick="send('Portfolio summary')">Portfolio</button>
+            <button class="suggestion-btn" onclick="send('Set price alert for SOL')">Price alert</button>
           </div>
+        </div>
 
-          <!-- Input -->
-          <div class="p-4 border-t border-dark-800">
-            <form onsubmit="handleSubmit(event)" class="flex gap-3">
-              <input 
-                type="text" 
-                id="chat-input"
-                placeholder="Tell me what you want to do..." 
-                class="flex-1 bg-dark-800 border border-dark-700 rounded-xl px-4 py-3 text-sm text-white placeholder-dark-500 focus:outline-none focus:border-vault-500 transition-colors"
-              >
-              <button 
-                type="submit" 
-                class="px-6 py-3 bg-vault-600 hover:bg-vault-700 rounded-xl text-sm font-medium text-white transition-colors"
-              >
-                Send
-              </button>
-            </form>
-          </div>
+        <div class="chat-input-area">
+          <form onsubmit="handleSubmit(event)" class="flex gap-3">
+            <input type="text" id="input" class="input flex-1" placeholder="Tell me what you want to do...">
+            <button type="submit" class="btn btn-primary">Send</button>
+          </form>
         </div>
       </div>
     </div>
 
-    <!-- Activity Feed -->
-    <div class="mt-6 bg-dark-900 border border-dark-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white mb-4">Recent Activity</h3>
-      <div class="space-y-3" id="activity-feed">
-        <div class="flex items-center gap-4 p-3 bg-dark-800 rounded-lg">
-          <div class="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
-            <span class="text-green-400">✓</span>
-          </div>
+    <!-- Activity -->
+    <div class="card" style="margin-top: 24px;">
+      <h3 class="font-semibold text-white" style="margin-bottom: 16px;">Recent Activity</h3>
+      <div class="space-y-3" id="activity">
+        <div class="activity-row">
+          <div class="activity-icon activity-icon-success"><span class="text-green-400">✓</span></div>
           <div class="flex-1">
             <p class="text-sm text-white">Staked 3 SOL → mSOL via Marinade</p>
-            <p class="text-xs text-dark-400">2 hours ago • Policy: Approved</p>
+            <p class="text-xs text-gray-400">2 hours ago • Approved</p>
           </div>
-          <a href="#" class="text-xs text-vault-400 hover:text-vault-300">View tx →</a>
+          <a href="#" class="text-xs text-purple-400">View tx →</a>
         </div>
-        <div class="flex items-center gap-4 p-3 bg-dark-800 rounded-lg">
-          <div class="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
-            <span class="text-green-400">✓</span>
-          </div>
+        <div class="activity-row">
+          <div class="activity-icon activity-icon-success"><span class="text-green-400">✓</span></div>
           <div class="flex-1">
-            <p class="text-sm text-white">Swapped 2 SOL → 249.50 USDC via Jupiter</p>
-            <p class="text-xs text-dark-400">5 hours ago • Slippage: 0.2%</p>
+            <p class="text-sm text-white">Swapped 2 SOL → 249 USDC via Jupiter</p>
+            <p class="text-xs text-gray-400">5 hours ago • Slippage: 0.2%</p>
           </div>
-          <a href="#" class="text-xs text-vault-400 hover:text-vault-300">View tx →</a>
+          <a href="#" class="text-xs text-purple-400">View tx →</a>
         </div>
-        <div class="flex items-center gap-4 p-3 bg-dark-800 rounded-lg">
-          <div class="w-10 h-10 bg-blue-500/10 rounded-full flex items-center justify-center">
-            <span class="text-blue-400">⚡</span>
-          </div>
+        <div class="activity-row">
+          <div class="activity-icon activity-icon-info"><span class="text-blue-400">⚡</span></div>
           <div class="flex-1">
-            <p class="text-sm text-white">Price trigger activated: SOL crossed $125</p>
-            <p class="text-xs text-dark-400">Yesterday • Auto-executed DCA buy</p>
+            <p class="text-sm text-white">Price trigger: SOL crossed $125</p>
+            <p class="text-xs text-gray-400">Yesterday • Auto-executed</p>
           </div>
-          <a href="#" class="text-xs text-vault-400 hover:text-vault-300">View tx →</a>
+          <a href="#" class="text-xs text-purple-400">View tx →</a>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="border-t border-dark-800 mt-12 py-8">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+  <footer>
+    <div class="container flex items-center justify-between" style="flex-wrap: wrap; gap: 16px;">
       <div class="flex items-center gap-2">
-        <span class="text-2xl">🏦</span>
+        <span style="font-size: 24px;">🏦</span>
         <span class="font-bold text-white">AgentVault</span>
-        <span class="text-dark-500">•</span>
-        <span class="text-dark-400 text-sm">Autonomous finance, your rules.</span>
+        <span class="text-gray-500">•</span>
+        <span class="text-gray-400 text-sm">Autonomous finance, your rules.</span>
       </div>
       <div class="flex items-center gap-6">
-        <a href="https://github.com/cloudweaver/agentvault" target="_blank" class="text-dark-400 hover:text-white transition-colors text-sm">GitHub</a>
-        <a href="https://github.com/cloudweaver/agentvault#readme" target="_blank" class="text-dark-400 hover:text-white transition-colors text-sm">Documentation</a>
-        <a href="https://discord.gg/agentvault" target="_blank" class="text-dark-400 hover:text-white transition-colors text-sm">Discord</a>
+        <a href="https://github.com/cloudweaver/agentvault">GitHub</a>
+        <a href="https://github.com/cloudweaver/agentvault#readme">Docs</a>
       </div>
     </div>
   </footer>
 
   <script>
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    const activityFeed = document.getElementById('activity-feed');
+    const messages = document.getElementById('messages');
+    const input = document.getElementById('input');
+    const activity = document.getElementById('activity');
 
-    function addMessage(content, isUser = false, hasActions = false) {
+    function addMsg(text, isUser, hasActions) {
       const div = document.createElement('div');
-      div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
-      
-      let actionsHtml = '';
-      if (hasActions) {
-        actionsHtml = `
-          <div class="flex gap-2 mt-3 pt-3 border-t border-dark-700">
-            <button onclick="approveAction(this)" class="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors">
-              ✓ Approve
-            </button>
-            <button onclick="rejectAction(this)" class="px-4 py-1.5 bg-red-600/80 hover:bg-red-600 text-white text-xs rounded-lg transition-colors">
-              ✕ Reject
-            </button>
-          </div>
-        `;
-      }
-
+      div.className = 'message ' + (isUser ? 'message-user' : 'message-agent');
       div.innerHTML = `
-        <div class="max-w-[85%] ${isUser ? 'bg-vault-600' : 'bg-dark-800'} rounded-2xl ${isUser ? 'rounded-tr-md' : 'rounded-tl-md'} px-4 py-3">
-          <div class="text-sm ${isUser ? 'text-white' : 'text-dark-100'} whitespace-pre-wrap">${content}</div>
-          ${actionsHtml}
-          <p class="text-xs ${isUser ? 'text-vault-300' : 'text-dark-500'} mt-2">Just now</p>
-        </div>
+        <div class="text-sm">${text}</div>
+        ${hasActions ? `
+          <div class="actions" id="actions-${Date.now()}">
+            <button class="btn btn-success btn-small" onclick="approve(this)">✓ Approve</button>
+            <button class="btn btn-danger btn-small" onclick="reject(this)">✕ Reject</button>
+          </div>
+        ` : ''}
+        <p class="message-time">Just now</p>
       `;
-      
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
     }
 
-    function addTypingIndicator() {
+    function addTyping() {
       const div = document.createElement('div');
-      div.className = 'flex justify-start';
-      div.id = 'typing-indicator';
-      div.innerHTML = `
-        <div class="bg-dark-800 rounded-2xl rounded-tl-md px-4 py-3">
-          <div class="typing-indicator flex gap-1">
-            <span class="w-2 h-2 bg-vault-400 rounded-full"></span>
-            <span class="w-2 h-2 bg-vault-400 rounded-full"></span>
-            <span class="w-2 h-2 bg-vault-400 rounded-full"></span>
-          </div>
-        </div>
-      `;
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      div.className = 'message message-agent';
+      div.id = 'typing';
+      div.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
     }
 
-    function removeTypingIndicator() {
-      const indicator = document.getElementById('typing-indicator');
-      if (indicator) indicator.remove();
+    function removeTyping() {
+      const t = document.getElementById('typing');
+      if (t) t.remove();
     }
 
-    function getResponse(input) {
-      const lower = input.toLowerCase();
-      
-      if (lower.includes('swap')) {
-        const match = input.match(/(\d+\.?\d*)\s*sol/i);
-        const amount = match ? match[1] : '1';
-        const usdcAmount = (parseFloat(amount) * 124.50).toFixed(2);
+    function getReply(text) {
+      const t = text.toLowerCase();
+      if (t.includes('swap')) {
+        const m = text.match(/(\d+)/);
+        const amt = m ? m[1] : '1';
         return {
-          content: `<strong>Action Plan: Token Swap</strong>
-
-I'll swap ${amount} SOL → USDC via Jupiter.
-
-📊 <strong>Quote:</strong>
-• Input: ${amount} SOL (~$${(parseFloat(amount) * 125).toFixed(2)})
-• Output: ~${usdcAmount} USDC
-• Route: SOL → USDC (Raydium)
-• Price Impact: 0.02%
-• Slippage: 0.5% max
-
-✅ <strong>Policy Check:</strong>
-• Within daily limit (${amount}/20 SOL)
-• Asset allowlisted ✓
-• Slippage within bounds ✓
-
+          text: `<strong>🔄 Action Plan: Token Swap</strong><br><br>
+I'll swap ${amt} SOL → USDC via Jupiter.<br><br>
+📊 <strong>Quote:</strong><br>
+• Input: ${amt} SOL (~$${amt * 125})<br>
+• Output: ~${(amt * 124.5).toFixed(2)} USDC<br>
+• Slippage: 0.5% max<br><br>
+✅ <strong>Policy Check:</strong> All constraints satisfied<br><br>
 Ready to execute?`,
           hasActions: true
         };
       }
-      
-      if (lower.includes('stake')) {
-        const match = input.match(/(\d+\.?\d*)\s*sol/i);
-        const amount = match ? match[1] : '2';
-        const msolAmount = (parseFloat(amount) / 1.05).toFixed(4);
+      if (t.includes('stake')) {
+        const m = text.match(/(\d+)/);
+        const amt = m ? m[1] : '2';
         return {
-          content: `<strong>Action Plan: Liquid Staking</strong>
-
-I'll stake ${amount} SOL with Marinade Finance.
-
-📊 <strong>Quote:</strong>
-• Input: ${amount} SOL
-• Output: ~${msolAmount} mSOL
-• Exchange Rate: 1 mSOL = 1.05 SOL
-• Current APY: 6.8%
-
-✅ <strong>Policy Check:</strong>
-• Within daily limit ✓
-• Marinade allowlisted ✓
-• Auto-execute: Manual approval required
-
-💡 Your mSOL can be used as collateral on MarginFi while earning staking rewards!`,
+          text: `<strong>📈 Action Plan: Liquid Staking</strong><br><br>
+I'll stake ${amt} SOL with Marinade.<br><br>
+📊 <strong>Quote:</strong><br>
+• Input: ${amt} SOL<br>
+• Output: ~${(amt / 1.05).toFixed(4)} mSOL<br>
+• Current APY: 6.8%<br><br>
+✅ <strong>Policy Check:</strong> Within limits<br><br>
+💡 mSOL can be used as collateral while earning!`,
           hasActions: true
         };
       }
-      
-      if (lower.includes('portfolio') || lower.includes('worth') || lower.includes('balance')) {
+      if (t.includes('portfolio') || t.includes('balance') || t.includes('worth')) {
         return {
-          content: `<strong>📊 Portfolio Summary</strong>
-
-<strong>Total Value:</strong> $2,847.32 (+$127.45 today)
-
-<strong>Holdings:</strong>
-• SOL: 12.50 → $1,562 (55%)
-• USDC: 750.00 → $750 (26%)
-• mSOL: 4.20 → $535 (19%)
-
-<strong>Staking:</strong>
-• mSOL earning 6.8% APY (~$36/year)
-
-<strong>Policy Status:</strong>
-• Daily spent: 3.2 / 20 SOL
-• Stablecoin reserve: 26% (min 20%) ✓`,
+          text: `<strong>📊 Portfolio Summary</strong><br><br>
+<strong>Total Value:</strong> $2,847.32 (+4.7% today)<br><br>
+<strong>Holdings:</strong><br>
+• SOL: 12.5 → $1,562 (55%)<br>
+• USDC: 750 → $750 (26%)<br>
+• mSOL: 4.2 → $535 (19%)<br><br>
+<strong>Yield:</strong> mSOL earning 6.8% APY<br>
+<strong>Policy:</strong> 26% stablecoins (min 20%) ✓`,
           hasActions: false
         };
       }
-      
-      if (lower.includes('alert') || lower.includes('trigger') || lower.includes('notify')) {
+      if (t.includes('alert') || t.includes('trigger') || t.includes('price')) {
         return {
-          content: `<strong>Action Plan: Price Trigger</strong>
-
-I'll set up a price alert for you:
-
-⚡ <strong>Trigger Configuration:</strong>
-• Asset: SOL/USD
-• Condition: Price < $100
-• Action: Notify + optional buy
-
-📋 <strong>Options:</strong>
-1. Alert only (notification)
-2. Auto-buy 2 SOL when triggered
-3. Auto-buy with DCA (split into 4 buys)
-
-✅ <strong>Policy Check:</strong>
-• Price triggers: Auto-execute enabled
-• Would use 2/20 daily limit if auto-buy
-
-Which option would you prefer?`,
+          text: `<strong>⚡ Action Plan: Price Alert</strong><br><br>
+I'll set up a price trigger for SOL.<br><br>
+📋 <strong>Configuration:</strong><br>
+• Asset: SOL/USD<br>
+• Condition: Price < $100<br>
+• Action: Notify + optional auto-buy<br><br>
+✅ <strong>Policy:</strong> Auto-execute enabled for triggers`,
           hasActions: true
         };
       }
-      
-      if (lower.includes('lend') || lower.includes('supply') || lower.includes('marginfi')) {
-        return {
-          content: `<strong>Action Plan: Lending</strong>
-
-I'll supply assets to MarginFi for you.
-
-📊 <strong>Current Rates:</strong>
-• USDC: 5.2% APY (70% utilization)
-• SOL: 3.1% APY (60% utilization)
-
-💡 <strong>Recommendation:</strong>
-Supply 500 USDC → Earn ~$26/year
-Your funds remain liquid and can be withdrawn anytime.
-
-✅ <strong>Policy Check:</strong>
-• MarginFi allowlisted ✓
-• Auto-execute: Manual approval required`,
-          hasActions: true
-        };
-      }
-
       return {
-        content: `I understand you want to "${input}".
-
-Let me analyze the best approach within your policy constraints...
-
-<strong>Available Actions:</strong>
-• 🔄 <strong>Swap</strong> - Exchange tokens via Jupiter
-• 📈 <strong>Stake</strong> - Earn yield with Marinade
-• 🏦 <strong>Lend</strong> - Supply to MarginFi
-• ⚡ <strong>Triggers</strong> - Set price alerts
-
-What would you like to do specifically?`,
+        text: `I can help you with:<br><br>
+• 🔄 <strong>Swap</strong> - "Swap 1 SOL to USDC"<br>
+• 📈 <strong>Stake</strong> - "Stake 2 SOL"<br>
+• 📊 <strong>Portfolio</strong> - "Show my balance"<br>
+• ⚡ <strong>Alerts</strong> - "Set price alert"<br><br>
+What would you like to do?`,
         hasActions: false
       };
     }
 
     function handleSubmit(e) {
       e.preventDefault();
-      const input = chatInput.value.trim();
-      if (!input) return;
-
-      addMessage(input, true);
-      chatInput.value = '';
-
-      addTypingIndicator();
-
+      const text = input.value.trim();
+      if (!text) return;
+      addMsg(text, true, false);
+      input.value = '';
+      addTyping();
       setTimeout(() => {
-        removeTypingIndicator();
-        const response = getResponse(input);
-        addMessage(response.content, false, response.hasActions);
-      }, 1500);
+        removeTyping();
+        const r = getReply(text);
+        addMsg(r.text, false, r.hasActions);
+      }, 1200);
     }
 
-    function sendSuggestion(text) {
-      chatInput.value = text;
+    function send(text) {
+      input.value = text;
       handleSubmit(new Event('submit'));
     }
 
-    function approveAction(btn) {
-      const container = btn.closest('.flex.gap-2');
-      container.innerHTML = `
-        <div class="flex items-center gap-2 text-green-400">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-          <span class="text-xs">Executing transaction...</span>
-        </div>
-      `;
-
+    function approve(btn) {
+      const div = btn.parentElement;
+      div.innerHTML = '<span class="text-green-400 text-xs">✓ Executing...</span>';
       setTimeout(() => {
-        container.innerHTML = `
-          <div class="flex items-center gap-2 text-green-400">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            <span class="text-xs">Transaction confirmed!</span>
-            <a href="#" class="text-vault-400 hover:text-vault-300 underline">View on Solscan →</a>
-          </div>
-        `;
-
-        addActivity('Transaction executed successfully', 'Just now');
-      }, 2000);
+        div.innerHTML = '<span class="text-green-400 text-xs">✓ Transaction confirmed! <a href="#" class="text-purple-400">View →</a></span>';
+        addActivity();
+      }, 1500);
     }
 
-    function rejectAction(btn) {
-      const container = btn.closest('.flex.gap-2');
-      container.innerHTML = `
-        <div class="flex items-center gap-2 text-red-400">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-          <span class="text-xs">Action cancelled</span>
-        </div>
-      `;
+    function reject(btn) {
+      const div = btn.parentElement;
+      div.innerHTML = '<span class="text-red-400 text-xs">✕ Cancelled</span>';
     }
 
-    function addActivity(text, time) {
+    function addActivity() {
       const div = document.createElement('div');
-      div.className = 'flex items-center gap-4 p-3 bg-dark-800 rounded-lg animate-pulse-slow';
+      div.className = 'activity-row';
+      div.style.animation = 'pulse 1s';
       div.innerHTML = `
-        <div class="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
-          <span class="text-green-400">✓</span>
-        </div>
+        <div class="activity-icon activity-icon-success"><span class="text-green-400">✓</span></div>
         <div class="flex-1">
-          <p class="text-sm text-white">${text}</p>
-          <p class="text-xs text-dark-400">${time} • Policy: Approved</p>
+          <p class="text-sm text-white">New transaction executed</p>
+          <p class="text-xs text-gray-400">Just now • Approved</p>
         </div>
-        <a href="#" class="text-xs text-vault-400 hover:text-vault-300">View tx →</a>
+        <a href="#" class="text-xs text-purple-400">View tx →</a>
       `;
-      activityFeed.insertBefore(div, activityFeed.firstChild);
-      
-      setTimeout(() => div.classList.remove('animate-pulse-slow'), 2000);
+      activity.insertBefore(div, activity.firstChild);
     }
   </script>
 </body>
