@@ -89,3 +89,4 @@ If you discover a security vulnerability, please email security@agentvault.io in
 ## Questions?
 
 Join our [Discord](https://discord.gg/agentvault) for discussions and support.
+
