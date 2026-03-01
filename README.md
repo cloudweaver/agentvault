@@ -53,7 +53,7 @@ AgentVault transforms your Solana wallet into an intelligent, autonomous financi
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PROTOCOL ADAPTERS (L4)                       │
-│          Jupiter · Raydium · Marinade · Orca · Tensor           │
+│          Jupiter · Marinade · MarginFi · Kamino · Orca          │
 └─────────────────────────────────────────────────────────────────┘
                                  │
                                  ▼
@@ -111,63 +111,86 @@ pnpm dev
 # Copy environment template
 cp .env.example .env
 
-# Configure your environment
-# - ANTHROPIC_API_KEY: Your Claude API key
-# - HELIUS_API_KEY: Solana RPC provider
-# - DATABASE_URL: PostgreSQL connection string
+# Configure your environment variables:
 ```
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `ANTHROPIC_API_KEY` | Claude API key for LLM reasoning | ✅ |
+| `SOLANA_RPC_URL` | Solana RPC endpoint (Helius recommended) | ✅ |
+| `HELIUS_API_KEY` | Helius API key for webhooks & enhanced RPC | ✅ |
+| `DATABASE_URL` | PostgreSQL connection string | ✅ |
+| `REDIS_URL` | Redis URL for caching & sessions | Optional |
+| `XAI_API_KEY` | Grok API key (fallback LLM) | Optional |
 
 ## Project Structure
 
 ```
 agentvault/
 ├── programs/
-│   └── agentvault/          # Anchor Solana program (Rust)
+│   └── agentvault/              # Anchor Solana program (Rust)
 │       ├── src/
-│       │   ├── lib.rs       # Program entrypoint
-│       │   ├── instructions/# Instruction handlers
-│       │   ├── state/       # Account structures
-│       │   └── errors.rs    # Custom errors
+│       │   ├── lib.rs           # Program entrypoint
+│       │   ├── instructions/    # Instruction handlers
+│       │   │   ├── initialize_vault.rs
+│       │   │   ├── execute_swap.rs      # Jupiter CPI
+│       │   │   ├── execute_stake.rs     # Marinade CPI
+│       │   │   ├── execute_lend.rs      # MarginFi/Kamino CPI
+│       │   │   ├── update_policy.rs
+│       │   │   ├── withdraw.rs
+│       │   │   ├── emergency_halt.rs
+│       │   │   ├── register_strategy.rs
+│       │   │   ├── subscribe_strategy.rs
+│       │   │   └── record_performance.rs
+│       │   ├── state/           # Account structures
+│       │   └── errors.rs        # Custom errors
 │       └── Cargo.toml
-├── runtime/                  # Agent runtime (TypeScript)
+├── runtime/                      # Agent runtime (TypeScript)
 │   ├── src/
-│   │   ├── agent/           # Core agent logic
-│   │   ├── llm/             # LLM provider integrations
-│   │   ├── policy/          # Policy engine
-│   │   ├── adapters/        # Protocol adapters
-│   │   └── tools/           # MCP tool definitions
+│   │   ├── agent/
+│   │   │   └── runtime.ts       # Core agent orchestration
+│   │   ├── llm/
+│   │   │   └── claude.ts        # Claude integration
+│   │   ├── policy/
+│   │   │   └── engine.ts        # Policy validation
+│   │   ├── adapters/
+│   │   │   ├── jupiter.ts       # Swap routing & execution
+│   │   │   ├── marinade.ts      # Liquid staking
+│   │   │   └── marginfi.ts      # Lending/borrowing
+│   │   ├── tools/               # MCP tool definitions
+│   │   └── types/               # TypeScript types
 │   └── package.json
-├── app/                      # Frontend (Next.js)
+├── app/                          # Frontend (Next.js)
 │   ├── src/
-│   │   ├── app/             # App router pages
-│   │   ├── components/      # React components
-│   │   └── lib/             # Utilities
+│   │   ├── app/                 # App router pages
+│   │   ├── components/          # React components
+│   │   └── lib/                 # Utilities
 │   └── package.json
-├── packages/
-│   ├── sdk/                 # TypeScript SDK
-│   └── types/               # Shared type definitions
-├── tests/                   # Integration tests
-├── Anchor.toml              # Anchor configuration
-└── package.json             # Workspace root
+├── docs/                         # Documentation
+│   ├── ARCHITECTURE.md
+│   ├── POLICIES.md
+│   └── QUICKSTART.md
+├── Anchor.toml                   # Anchor configuration
+└── package.json                  # Workspace root
 ```
 
 ## Solana Program
 
-The AgentVault program provides on-chain infrastructure for secure, policy-constrained agent execution.
+The AgentVault program provides on-chain infrastructure for secure, policy-constrained agent execution with real CPI calls to DeFi protocols.
 
 ### Instructions
 
-| Instruction | Description |
-|-------------|-------------|
-| `initialize_vault` | Create user vault with agent delegate and initial policy |
-| `update_policy` | Update on-chain policy hash (user signature required) |
-| `execute_swap` | Agent-signed swap via Jupiter CPI within spending limits |
-| `execute_stake` | Stake SOL to validators or liquid staking protocols |
-| `execute_lend` | Supply assets to lending protocols |
-| `register_strategy` | Publish strategy to marketplace registry |
-| `subscribe_strategy` | Subscribe to a strategy with fee payment |
-| `withdraw` | User-signed withdrawal from vault |
-| `emergency_halt` | Freeze all agent activity (user-only) |
+| Instruction | Description | CPI Target |
+|-------------|-------------|------------|
+| `initialize_vault` | Create user vault with agent delegate and initial policy | — |
+| `update_policy` | Update on-chain policy hash (user signature required) | — |
+| `execute_swap` | Agent-signed swap with slippage protection | Jupiter V6 |
+| `execute_stake` | Stake SOL to liquid staking | Marinade |
+| `execute_lend` | Supply assets to lending protocols | MarginFi / Kamino |
+| `register_strategy` | Publish strategy to marketplace registry | — |
+| `subscribe_strategy` | Subscribe to a strategy with fee payment | — |
+| `withdraw` | User-signed withdrawal from vault | — |
+| `emergency_halt` | Freeze all agent activity (user-only) | — |
 
 ### Account Structure
 
@@ -179,6 +202,8 @@ pub struct UserVault {
     pub policy_hash: [u8; 32],   // Hash of active policy config
     pub balance: u64,            // SOL balance in vault
     pub status: VaultStatus,     // Active, Paused, Halted
+    pub last_activity: i64,
+    pub tx_count: u64,
     pub created_at: i64,
     pub bump: u8,
 }
@@ -188,6 +213,9 @@ pub struct PolicyConfig {
     pub vault: Pubkey,
     pub daily_limit: u64,        // Max SOL per day
     pub tx_limit: u64,           // Max SOL per transaction
+    pub daily_spent: u64,        // Tracking for daily limit
+    pub last_reset: i64,         // Last daily reset timestamp
+    pub max_slippage_bps: u16,   // Max slippage in basis points
     pub asset_allowlist: Vec<Pubkey>,
     pub program_allowlist: Vec<Pubkey>,
     pub auto_execute: bool,
@@ -195,47 +223,58 @@ pub struct PolicyConfig {
 }
 ```
 
+### Integrated Protocols
+
+| Protocol | Address | Function |
+|----------|---------|----------|
+| Jupiter V6 | `JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4` | Token swaps |
+| Marinade | `MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD` | Liquid staking (mSOL) |
+| MarginFi | `MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA` | Lending/borrowing |
+| Kamino | `KLend2g3cP87ber41GAmhvH3VPVwWvxTKjkN6nh8VqD` | Lending/borrowing |
+
 ## Agent Runtime
 
 The runtime hosts AI agents that interpret user intent and execute on-chain actions within policy constraints.
 
-### Reasoning Loop
+### Execution Pipeline
 
 ```
-┌─────────┐     ┌──────────┐     ┌─────────┐     ┌────────┐
-│  PLAN   │ ──▶ │ VALIDATE │ ──▶ │ EXECUTE │ ──▶ │ REPORT │
-└─────────┘     └──────────┘     └─────────┘     └────────┘
-    │                │                │               │
-    ▼                ▼                ▼               ▼
-  LLM generates   Policy engine   Adapters build   Results logged
-  ActionPlan      checks limits   & submit tx      with reasoning
+┌─────────┐     ┌──────────┐     ┌──────────┐     ┌─────────┐     ┌────────┐
+│  PLAN   │ ──▶ │ VALIDATE │ ──▶ │ SIMULATE │ ──▶ │ EXECUTE │ ──▶ │ REPORT │
+└─────────┘     └──────────┘     └──────────┘     └─────────┘     └────────┘
+    │                │                │                │               │
+    ▼                ▼                ▼                ▼               ▼
+  LLM generates   Policy engine   Transaction      Adapters build   Results logged
+  ActionPlan      checks limits   simulation       & submit tx      with reasoning
 ```
 
-### Tool Definitions (MCP)
+### Protocol Adapters
 
-```typescript
-const tools = {
-  swap_tokens: {
-    description: "Execute token swap via Jupiter",
-    parameters: {
-      inputMint: "SPL token mint address",
-      outputMint: "SPL token mint address", 
-      amount: "Amount in lamports",
-      slippage: "Max slippage in basis points"
-    }
-  },
-  check_price: {
-    description: "Get real-time token price",
-    parameters: {
-      mint: "SPL token mint address"
-    }
-  },
-  get_portfolio: {
-    description: "Retrieve current vault balances and positions"
-  },
-  // ... more tools
-};
-```
+**Jupiter Adapter** (`runtime/src/adapters/jupiter.ts`)
+- Quote fetching with optimal routing
+- Slippage protection
+- Transaction simulation
+- Real-time price feeds
+
+**Marinade Adapter** (`runtime/src/adapters/marinade.ts`)
+- SOL → mSOL staking
+- Exchange rate fetching
+- APY estimation
+- Balance tracking
+
+**MarginFi Adapter** (`runtime/src/adapters/marginfi.ts`)
+- Deposit/withdraw operations
+- Pool APY fetching
+- Position management
+- Multi-asset support
+
+### Monitoring Loop
+
+The agent runs a background monitoring loop (default: 30 seconds) that:
+- Checks price feeds for trigger conditions
+- Evaluates portfolio health
+- Fires autonomous actions when conditions are met
+- Respects auto-execute policy settings
 
 ## Policy Engine
 
@@ -249,8 +288,8 @@ Policies define what the agent can and cannot do. They're enforced at two layers
 | Category | Description | Example |
 |----------|-------------|---------|
 | Spending Limits | Per-tx and daily maximums | Max 5 SOL per swap, 20 SOL/day |
-| Asset Allowlist | Tokens the agent can hold | Only SOL, USDC, JitoSOL |
-| Program Allowlist | Contracts the agent can call | Jupiter v6, Marinade only |
+| Asset Allowlist | Tokens the agent can hold | Only SOL, USDC, mSOL |
+| Program Allowlist | Contracts the agent can call | Jupiter, Marinade, MarginFi |
 | Position Limits | Max allocation per token | Max 30% in any single token |
 | Slippage Guard | Maximum acceptable slippage | Reject trades with >1% slip |
 | Auto-Execute | Which actions need approval | Price triggers: auto; new protocols: manual |
@@ -265,8 +304,16 @@ Policies define what the agent can and cannot do. They're enforced at two layers
     "daily": { "sol": 20 }
   },
   "allowlists": {
-    "assets": ["So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"],
-    "programs": ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"]
+    "assets": [
+      "So11111111111111111111111111111111111111112",
+      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So"
+    ],
+    "programs": [
+      "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+      "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
+      "MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA"
+    ]
   },
   "limits": {
     "maxPositionPercent": 30,
@@ -374,16 +421,33 @@ pnpm --filter app dev
 
 ## Roadmap
 
-- [x] Core Solana program (vault, policies, swaps)
+### Phase 1: Foundation ✅
+- [x] Core Solana program (vault, policies)
+- [x] Jupiter swap CPI integration
+- [x] Marinade staking CPI integration
+- [x] MarginFi/Kamino lending CPI integration
 - [x] Agent runtime with Claude integration
-- [x] Policy engine (off-chain + on-chain)
-- [x] Jupiter swap adapter
-- [ ] Marinade staking adapter
-- [ ] MarginFi lending adapter
-- [ ] Strategy marketplace contracts
-- [ ] Performance tracking system
-- [ ] Frontend dashboard
-- [ ] Mobile app
+- [x] Policy engine (off-chain + on-chain validation)
+- [x] Protocol adapters (Jupiter, Marinade, MarginFi)
+
+### Phase 2: Autonomy 🔄
+- [x] Monitoring loop with trigger evaluation
+- [ ] WebSocket server for real-time frontend connection
+- [ ] Database persistence (PostgreSQL + Redis)
+- [ ] Devnet deployment
+- [ ] Frontend dashboard integration
+
+### Phase 3: Marketplace
+- [ ] Strategy registration UI
+- [ ] Performance tracking with on-chain PnL snapshots
+- [ ] Revenue sharing system
+- [ ] Strategy store with filtering & ratings
+
+### Phase 4: Scale
+- [ ] Mobile app (React Native / PWA)
+- [ ] Multi-LLM providers (Grok fallback)
+- [ ] Jito bundle integration for MEV protection
+- [ ] Cross-chain expansion via Wormhole
 - [ ] Mainnet deployment
 
 ## Contributing
@@ -416,6 +480,3 @@ MIT License — see [LICENSE](LICENSE) for details.
 [Website](https://agentvault.io) · [Docs](https://docs.agentvault.io) · [Twitter](https://twitter.com/agentvault) · [Discord](https://discord.gg/agentvault)
 
 </div>
-
-
-
