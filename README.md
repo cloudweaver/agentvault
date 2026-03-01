@@ -9,7 +9,7 @@
 
 *Autonomous DeFi management within user-defined guardrails*
 
-[**🎮 Interactive Demo**](https://raw.githack.com/cloudweaver/agentvault/main/docs/demo.html) · [Documentation](https://github.com/cloudweaver/agentvault#readme) · [Discord](https://discord.gg/agentvault)
+[**🎮 Interactive Demo**](https://cloudweaver.github.io/agentvault/) · [Documentation](https://github.com/cloudweaver/agentvault#readme) · [Discord](https://discord.gg/agentvault)
 
 </div>
 
@@ -17,7 +17,7 @@
 
 ## 🎮 Try the Demo
 
-**[Launch Interactive Demo →](https://raw.githack.com/cloudweaver/agentvault/main/docs/demo.html)**
+**[Launch Interactive Demo →](https://cloudweaver.github.io/agentvault/)**
 
 Experience the AI-powered wallet interface:
 - 💬 **Chat with the agent** using natural language
